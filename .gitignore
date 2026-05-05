@@ -1,0 +1,25 @@
+# Sujet du test
+*.pdf
+
+# Environnement virtuel
+.venv/
+
+# Fichiers de secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Données brutes (trop lourdes pour Git)
+data/raw/
+
+# Node.js (frontend)
+node_modules/
+
+# Terraform
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.backup

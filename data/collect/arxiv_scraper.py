@@ -40,6 +40,7 @@ def fetch_papers(query: str) -> list[dict]:
             "title": result.title,
             "url": result.entry_id,
             "source": "arXiv",
+            "author": ", ".join(a.name for a in result.authors),
             "date": result.published.strftime("%Y-%m-%d"),
             "license": "arXiv non-exclusive license",
             "text": text,

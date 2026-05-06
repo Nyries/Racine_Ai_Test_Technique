@@ -46,12 +46,36 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 
 ### ✓ Wilson Center (wilsoncenter.org)
 - **Statut** : Succès
-- **Documents récoltés** : 212 (scraping en cours)
+- **Documents récoltés** : 1 138
 - **Méthode** : Découverte des URLs via sitemap.xml (63 pages), filtrage par mots-clés Moyen-Orient dans le slug, scraping HTML statique
 - **Licence** : © Wilson Center (fair use — recherche non commerciale)
 - **Remarques** :
   - Auteur extrait depuis `<div class="article-meta">` ou fallback "By ..." dans le corps
   - Certains articles anciens n'ont pas de `article-meta` → auteur `unknown`
+
+---
+
+### ✓ Brookings Institution (brookings.edu)
+- **Statut** : Succès
+- **Documents récoltés** : 5 009
+- **Méthode** : Découverte des URLs via article-sitemap.xml (54 fichiers), filtrage par mots-clés Moyen-Orient dans le slug, scraping HTML statique
+- **Licence** : © Brookings Institution (fair use — recherche non commerciale)
+- **Remarques** :
+  - Auteur extrait depuis le `<h5>` unique de la page
+  - Date extraite depuis le `<div>` suivant le `<h5>`
+  - Estimation initiale de ~7 758 URLs ; 5 009 articles retenus après filtrage (articles sans contenu `article-content` écartés)
+
+---
+
+### ✓ Wikipedia (en.wikipedia.org)
+- **Statut** : Succès
+- **Documents récoltés** : 1 339
+- **Méthode** : API MediaWiki, découverte par 43 catégories Moyen-Orient, texte brut via `prop=extracts&explaintext=1`, retry automatique sur 429
+- **Licence** : CC BY-SA 4.0
+- **Remarques** :
+  - Articles longs (moyenne ~30 KB), principale source de volume
+  - Rate limit 429 fréquent — résolu avec retry + `Retry-After` header
+  - L'API TextExtracts ne supporte pas le batch → 1 article par requête
 
 ---
 
@@ -63,12 +87,13 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 | Middle East Institute | ✗ Échec | 0 | Cloudflare (403) |
 | Carnegie Middle East | ✗ Échec | 0 | JavaScript rendering |
 | RAND Corporation | ✓ Succès | 311 | — |
-| Wilson Center | ✓ Succès | 212 (en cours) | — |
-| Brookings Institution | ⏳ À lancer | — | brookings_scraper.py prêt |
-| **Total** | | **578** | |
+| Wilson Center | ✓ Succès | 1 138 | — |
+| Brookings Institution | ✓ Succès | 5 009 | — |
+| Wikipedia | ✓ Succès | 1 339 | — |
+| **Total** | | **7 852** | |
 
-**Volume texte brut actuel : ~2.89 MB / ~720K tokens**
-**Objectif CPT : 50 MB / ~10-15M tokens → Wikipedia indispensable après Brookings**
+**Volume texte brut : ~66.76 MB / ~16.7M tokens**
+**Objectif CPT (50 MB) : ✓ ATTEINT**
 
 ---
 
@@ -78,3 +103,5 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 - Vérifier si le contenu est dans le code source HTML avant de coder (clic droit → Afficher le code source)
 - Les sites qui paginent avec `href=#` chargent leur contenu en JavaScript → non scrapable avec `requests`
 - Le sitemap.xml est une alternative fiable à la pagination quand il est renseigné
+- L'API MediaWiki TextExtracts ne supporte pas le batch malgré `exlimit=max` → toujours fetcher 1 article à la fois
+- Respecter le header `Retry-After` sur les 429 Wikipedia plutôt que d'utiliser un délai fixe

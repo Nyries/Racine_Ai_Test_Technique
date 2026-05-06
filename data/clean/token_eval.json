@@ -1,0 +1,18 @@
+{
+  "model": "Qwen/Qwen3.5-0.8B-Base",
+  "sample_size": 500,
+  "our_corpus": {
+    "docs": 500,
+    "total_chars": 3198073,
+    "total_tokens": 639830,
+    "mean_ratio": 4.9983
+  },
+  "fineweb_edu": {
+    "docs": 500,
+    "total_chars": 2182348,
+    "total_tokens": 483208,
+    "mean_ratio": 4.5164
+  },
+  "delta_chars_per_token": 0.4819,
+  "interpretation": "Our ratio matches or exceeds FineWeb-Edu. The base Qwen vocabulary handles our domain terms efficiently. Vocabulary extension is not warranted."
+}

@@ -61,7 +61,7 @@ def _get_model() -> BGEM3FlagModel:
     if _embed_model is None:
         settings = get_settings()
         print(f"Loading embedding model: {settings.embed_model}")
-        _embed_model = BGEM3FlagModel(settings.embed_model, use_fp16=True)
+        _embed_model = BGEM3FlagModel(settings.embed_model, use_fp16=False)
     return _embed_model
 
 

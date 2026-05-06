@@ -8,14 +8,15 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 ## Sources traitées
 
 ### ⏳ arXiv
-- **Statut** : À rescraper
-- **Documents récoltés** : 0 (187 précédemment récoltés puis supprimés)
+- **Statut** : Succès partiel — à compléter
+- **Documents récoltés** : 55 (présents dans data/raw/, sur 187 initialement récupérés)
 - **Méthode** : API officielle Python (`arxiv` library)
 - **Licence** : arXiv non-exclusive license
 - **Remarques** :
   - Contenu académique, orienté sciences computationnelles appliquées aux conflits
   - Le champ `author` était absent des fichiers — corrigé dans le script
   - Erreur 429 (rate limit) si relancé trop tôt — attendre quelques heures entre deux runs
+  - Relancer le scraper pour atteindre les ~187 documents initiaux
 
 ---
 
@@ -43,14 +44,30 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 
 ---
 
+### ✓ Wilson Center (wilsoncenter.org)
+- **Statut** : Succès
+- **Documents récoltés** : 26
+- **Méthode** : Découverte des URLs via sitemap.xml (63 pages), filtrage par mots-clés Moyen-Orient dans le slug, scraping HTML statique
+- **Licence** : © Wilson Center (fair use — recherche non commerciale)
+- **Remarques** :
+  - Auteur extrait depuis `<div class="article-meta">` ou fallback "By ..." dans le corps
+  - Certains articles anciens n'ont pas de `article-meta` → auteur `unknown`
+
+---
+
 ## Bilan
 
 | Source | Statut | Documents | Raison d'échec |
 |--------|--------|-----------|----------------|
-| arXiv | ⏳ À rescraper | 0 | Documents supprimés, rate limit 429 |
+| arXiv | ⏳ Partiel | 55 | Rate limit 429 — à compléter |
 | Middle East Institute | ✗ Échec | 0 | Cloudflare (403) |
 | Carnegie Middle East | ✗ Échec | 0 | JavaScript rendering |
 | RAND Corporation | ✓ Succès | 311 | — |
+| Wilson Center | ✓ Succès | 26 | — |
+| **Total** | | **392** | |
+
+**Volume texte brut actuel : ~2 MB / ~530K tokens**
+**Objectif CPT : 50 MB / ~10-15M tokens → sources supplémentaires requises (Wikipedia)**
 
 ---
 

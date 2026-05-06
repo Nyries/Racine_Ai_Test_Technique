@@ -1,0 +1,92 @@
+{
+  "1_loaded": 7852,
+  "2_exact_dedup": {
+    "kept": 7852,
+    "removed": 0,
+    "examples_removed": []
+  },
+  "3_near_dedup": {
+    "kept": 7832,
+    "removed": 20,
+    "examples_removed": [
+      {
+        "id": "brookings_as-un-session-begins-another-iranian-president-weighs-in",
+        "title": "As UN Session Begins, Another Iranian President Weighs In",
+        "source": "Brookings Institution"
+      },
+      {
+        "id": "brookings_focus-on-al-qaeda-in-yemen-magnifies-chronic-instability",
+        "title": "Focus on Al Qaeda in Yemen Magnifies Chronic Instability",
+        "source": "Brookings Institution"
+      },
+      {
+        "id": "brookings_history-of-middle-eastern-politics",
+        "title": "History of Middle Eastern politics",
+        "source": "Brookings Institution"
+      }
+    ]
+  },
+  "4_quality_filter": {
+    "kept": 7796,
+    "removed_by_reason": {
+      "too_short": 0,
+      "not_english": 29,
+      "low_alpha": 0,
+      "high_repetition": 7
+    },
+    "examples_removed": {
+      "too_short": [],
+      "not_english": [
+        {
+          "id": "brookings_america-latina-y-la-crisis-economica-disenar-e-implementar-politicas-de-estimulo",
+          "title": "América Latina y la crisis económica: Diseñar e implementar políticas de estímulo",
+          "source": "Brookings Institution"
+        },
+        {
+          "id": "brookings_como-abordar-la-crisis-y-la-desesperacion-causadas-por-los-opioides-en-estados-unidos-mediante-mecanismos-normativos",
+          "title": "Comprender el papel de la desesperación en la crisis de los opioides en Estados Unidos",
+          "source": "Brookings Institution"
+        },
+        {
+          "id": "brookings_como-enfrentarse-a-la-crisis-de-los-opioides",
+          "title": "¿Cómo enfrentarse a la crisis de los opioides?",
+          "source": "Brookings Institution"
+        }
+      ],
+      "low_alpha": [],
+      "high_repetition": [
+        {
+          "id": "brookings_beth-ferris-documents-syrian-refugee-crisis-at-camps-in-turkey",
+          "title": "Beth Ferris Documents Syrian Refugee Crisis at Camps in Turkey",
+          "source": "Brookings Institution"
+        },
+        {
+          "id": "brookings_brookings-experts-discuss-iran-and-the-p51-nuclear-negotiations",
+          "title": "Brookings Experts Discuss Iran and the P5+1 Nuclear Negotiations",
+          "source": "Brookings Institution"
+        },
+        {
+          "id": "wilson_efforts-to-stop-iran-developing-nuclear-bomb",
+          "title": "Efforts to Stop Iran from Developing a Nuclear Bomb",
+          "source": "Wilson Center"
+        }
+      ]
+    }
+  },
+  "5_6_text_cleaning": {
+    "kept": 7796,
+    "removed_post_clean": 0
+  },
+  "7_final": {
+    "total_docs": 7796,
+    "total_chars": 65210478,
+    "total_mb": 65.21,
+    "by_source": {
+      "Brookings Institution": 4971,
+      "RAND Corporation": 311,
+      "Wikipedia": 1338,
+      "Wilson Center": 1121,
+      "arXiv": 55
+    }
+  }
+}

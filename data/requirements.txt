@@ -2,3 +2,5 @@ arxiv>=2.1
 requests>=2.32
 beautifulsoup4>=4.12
 lxml>=5.2
+datasketch>=1.6
+langdetect>=1.0.9

@@ -17,6 +17,9 @@ __pycache__/
 data/raw/*
 !data/raw/.gitkeep
 
+# Corpus nettoyé (shards JSONL, trop lourds pour Git)
+data/clean/corpus_*.jsonl
+
 # Node.js (frontend)
 node_modules/
 

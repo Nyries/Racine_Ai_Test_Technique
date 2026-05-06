@@ -63,7 +63,7 @@ def main() -> None:
     total = 0
 
     for query in QUERIES:
-        print(f"\nRecherche : {query}")
+        print(f"\nQuery: {query}")
         papers = fetch_papers(query)
 
         for paper in papers:
@@ -76,7 +76,7 @@ def main() -> None:
 
         time.sleep(2)
 
-    print(f"\nTerminé — {total} papiers sauvegardés dans {RAW_DIR}")
+    print(f"\nDone — {total} papers saved to {RAW_DIR}")
 
 
 if __name__ == "__main__":

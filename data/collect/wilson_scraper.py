@@ -64,11 +64,11 @@ def get_article_urls() -> list[str]:
             ]
             urls.extend(filtered)
 
-            print(f"  Page {page:02d}/{SITEMAP_PAGES} → {len(page_urls)} URLs, {len(filtered)} Moyen-Orient (total : {len(urls)})")
+            print(f"  Page {page:02d}/{SITEMAP_PAGES} → {len(page_urls)} URLs, {len(filtered)} Middle East (total: {len(urls)})")
             time.sleep(DELAY_SECONDS)
 
         except requests.RequestException as e:
-            print(f"  ✗ Erreur page {page} : {e}")
+            print(f"  ✗ Error on page {page}: {e}")
             time.sleep(DELAY_SECONDS)
 
     return urls
@@ -153,9 +153,9 @@ def save_document(doc: dict) -> None:
 def main() -> None:
     RAW_DIR.mkdir(exist_ok=True)
 
-    print("Récupération des URLs via sitemap...")
+    print("Fetching article URLs via sitemap...")
     urls = get_article_urls()
-    print(f"\n{len(urls)} articles Moyen-Orient trouvés.\n")
+    print(f"\n{len(urls)} Middle East articles found.\n")
 
     total = 0
     for url in urls:
@@ -168,10 +168,10 @@ def main() -> None:
             time.sleep(DELAY_SECONDS)
 
         except requests.RequestException as e:
-            print(f"✗ Erreur sur {url} : {e}")
+            print(f"✗ Error on {url}: {e}")
             time.sleep(DELAY_SECONDS)
 
-    print(f"\nTerminé — {total} articles sauvegardés dans {RAW_DIR}")
+    print(f"\nDone — {total} articles saved to {RAW_DIR}")
 
 
 if __name__ == "__main__":

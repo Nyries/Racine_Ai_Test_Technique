@@ -55,10 +55,10 @@ def get_article_urls() -> list[str]:
                     urls.append(full_url)
                     found += 1
 
-        print(f"  start={start} → {found} nouveaux articles (total : {len(urls)})")
+        print(f"  start={start} → {found} new articles (total: {len(urls)})")
 
         if found == 0:
-            print("  Plus de résultats.")
+            print("  No more results.")
             break
 
         start += ROWS_PER_PAGE
@@ -139,9 +139,9 @@ def save_document(doc: dict) -> None:
 def main() -> None:
     RAW_DIR.mkdir(exist_ok=True)
 
-    print("Récupération des URLs...")
+    print("Fetching article URLs...")
     urls = get_article_urls()
-    print(f"\n{len(urls)} articles trouvés.\n")
+    print(f"\n{len(urls)} articles found.\n")
 
     total = 0
     for url in urls:
@@ -154,10 +154,10 @@ def main() -> None:
             time.sleep(DELAY_SECONDS)
 
         except requests.RequestException as e:
-            print(f"✗ Erreur sur {url} : {e}")
+            print(f"✗ Error on {url}: {e}")
             time.sleep(DELAY_SECONDS)
 
-    print(f"\nTerminé — {total} articles sauvegardés dans {RAW_DIR}")
+    print(f"\nDone — {total} articles saved to {RAW_DIR}")
 
 
 if __name__ == "__main__":

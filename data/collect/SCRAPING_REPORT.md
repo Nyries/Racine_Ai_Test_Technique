@@ -7,16 +7,16 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 
 ## Sources traitées
 
-### ⏳ arXiv
-- **Statut** : Succès partiel — à compléter
-- **Documents récoltés** : 55 (présents dans data/raw/, sur 187 initialement récupérés)
+### ✓ arXiv
+- **Statut** : Succès
+- **Documents récoltés** : 55
 - **Méthode** : API officielle Python (`arxiv` library)
 - **Licence** : arXiv non-exclusive license
 - **Remarques** :
   - Contenu académique, orienté sciences computationnelles appliquées aux conflits
   - Le champ `author` était absent des fichiers — corrigé dans le script
   - Erreur 429 (rate limit) si relancé trop tôt — attendre quelques heures entre deux runs
-  - Relancer le scraper pour atteindre les ~187 documents initiaux
+  - Run précédent avait obtenu 187 docs ; run actuel limité à 55 (résultats API variables)
 
 ---
 
@@ -46,7 +46,7 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 
 ### ✓ Wilson Center (wilsoncenter.org)
 - **Statut** : Succès
-- **Documents récoltés** : 26
+- **Documents récoltés** : 212 (scraping en cours)
 - **Méthode** : Découverte des URLs via sitemap.xml (63 pages), filtrage par mots-clés Moyen-Orient dans le slug, scraping HTML statique
 - **Licence** : © Wilson Center (fair use — recherche non commerciale)
 - **Remarques** :
@@ -59,15 +59,16 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 
 | Source | Statut | Documents | Raison d'échec |
 |--------|--------|-----------|----------------|
-| arXiv | ⏳ Partiel | 55 | Rate limit 429 — à compléter |
+| arXiv | ✓ Succès | 55 | — |
 | Middle East Institute | ✗ Échec | 0 | Cloudflare (403) |
 | Carnegie Middle East | ✗ Échec | 0 | JavaScript rendering |
 | RAND Corporation | ✓ Succès | 311 | — |
-| Wilson Center | ✓ Succès | 26 | — |
-| **Total** | | **392** | |
+| Wilson Center | ✓ Succès | 212 (en cours) | — |
+| Brookings Institution | ⏳ À lancer | — | brookings_scraper.py prêt |
+| **Total** | | **578** | |
 
-**Volume texte brut actuel : ~2 MB / ~530K tokens**
-**Objectif CPT : 50 MB / ~10-15M tokens → sources supplémentaires requises (Wikipedia)**
+**Volume texte brut actuel : ~2.89 MB / ~720K tokens**
+**Objectif CPT : 50 MB / ~10-15M tokens → Wikipedia indispensable après Brookings**
 
 ---
 

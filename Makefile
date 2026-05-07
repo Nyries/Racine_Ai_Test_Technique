@@ -3,7 +3,8 @@
         db-start ingest ingest-sample \
         test benchmark benchmark-full \
         dev-backend dev-frontend \
-        setup
+        setup \
+        cpt-prepare cpt-train cpt-eval-perplexity cpt-eval-qa cpt-eval
 
 # ── Dependencies ──────────────────────────────────────────────────────────────
 
@@ -70,6 +71,22 @@ dev-backend:
 
 dev-frontend:
 	cd frontend && npm run dev
+
+# ── CPT — Continuous Pre-Training ────────────────────────────────────────────
+
+cpt-prepare:
+	cd cpt && python prepare_corpus.py
+
+cpt-train:
+	cd cpt && python train.py --config config.yaml
+
+cpt-eval-perplexity:
+	cd cpt && python eval_perplexity.py --finetuned ./checkpoints/final
+
+cpt-eval-qa:
+	cd cpt && python eval_qa.py --finetuned ./checkpoints/final
+
+cpt-eval: cpt-eval-perplexity cpt-eval-qa
 
 # ── Full setup from scratch ───────────────────────────────────────────────────
 

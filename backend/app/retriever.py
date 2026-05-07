@@ -118,7 +118,7 @@ def _rerank(question: str, candidates: list[_Candidate], top_n: int) -> list[_Ca
 # ---------------------------------------------------------------------------
 # Public interface
 # ---------------------------------------------------------------------------
-async def retrieve(question: str, session: AsyncSession) -> list[Source]:
+async def retrieve(question: str, session: AsyncSession, rerank: bool = True) -> list[Source]:
     settings = get_settings()
 
     # 1. Embed the question
@@ -133,8 +133,11 @@ async def retrieve(question: str, session: AsyncSession) -> list[Source]:
     # 3. RRF fusion
     fused = _rrf([dense, sparse])
 
-    # 4. Rerank
-    top = _rerank(question, fused, settings.rerank_top_n)
+    # 4. Rerank (optional — slow on CPU, fast on GPU)
+    if rerank:
+        top = _rerank(question, fused, settings.rerank_top_n)
+    else:
+        top = fused[: settings.rerank_top_n]
 
     # 5. Build Source objects for the LLM
     return [

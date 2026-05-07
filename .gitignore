@@ -23,6 +23,11 @@ data/clean/corpus_*.jsonl
 
 # Node.js (frontend)
 node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
 
 # Terraform
 infra/.terraform/

@@ -11,8 +11,11 @@ Usage
 import argparse
 import asyncio
 import json
+import time
 import uuid
 from pathlib import Path
+
+from tqdm import tqdm
 
 from FlagEmbedding import BGEM3FlagModel
 from pgvector.sqlalchemy import Vector
@@ -44,7 +47,7 @@ class Chunk(Base):
     title = mapped_column(Text, nullable=False)
     url = mapped_column(Text, nullable=False)
     source = mapped_column(String(128), nullable=False)
-    date = mapped_column(String(32))
+    date = mapped_column(String(128))
     content = mapped_column(Text, nullable=False)
     embedding = mapped_column(Vector(EMBED_DIM), nullable=False)
 
@@ -107,11 +110,12 @@ def _body(doc: dict) -> str:
 # ---------------------------------------------------------------------------
 # Database
 # ---------------------------------------------------------------------------
-async def create_tables(engine) -> None:
+async def create_tables(engine, reset: bool = False) -> None:
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        if reset:
+            await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-        # GIN index for full-text search (BM25 component of hybrid retrieval)
         await conn.execute(text(
             "CREATE INDEX IF NOT EXISTS chunks_tsv_idx "
             "ON chunks USING GIN (to_tsvector('english', content))"
@@ -130,12 +134,12 @@ async def create_vector_index(engine) -> None:
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
-async def ingest_all(limit: int | None = None) -> None:
+async def ingest_all(limit: int | None = None, reset: bool = False) -> None:
     settings = get_settings()
     engine = create_async_engine(settings.database_url, echo=False)
 
-    print("Creating tables and indexes...")
-    await create_tables(engine)
+    print("Creating tables and indexes..." + (" (reset)" if reset else ""))
+    await create_tables(engine, reset=reset)
 
     model = _get_model()
 
@@ -145,6 +149,7 @@ async def ingest_all(limit: int | None = None) -> None:
 
     total_chunks = 0
     total_docs = 0
+    t_start = time.monotonic()
 
     async with AsyncSession(engine) as session:
         for shard_path in shard_paths:
@@ -170,50 +175,53 @@ async def ingest_all(limit: int | None = None) -> None:
             for doc in docs:
                 for chunk in split_into_chunks(_body(doc), settings.chunk_size, settings.chunk_overlap):
                     pairs.append((doc, chunk))
-            print(f"  {len(pairs)} chunks — embedding...")
+            print(f"  {len(pairs)} chunks to embed")
 
             # Embed and insert in batches
-            for i in range(0, len(pairs), BATCH_SIZE):
-                batch = pairs[i : i + BATCH_SIZE]
-                texts = [chunk for _, chunk in batch]
+            with tqdm(total=len(pairs), unit="chunk", desc="  Embedding") as pbar:
+                for i in range(0, len(pairs), BATCH_SIZE):
+                    batch = pairs[i : i + BATCH_SIZE]
+                    texts = [chunk for _, chunk in batch]
 
-                result = model.encode(
-                    texts,
-                    batch_size=BATCH_SIZE,
-                    return_dense=True,
-                    return_sparse=False,
-                    return_colbert_vecs=False,
-                )
-                embeddings = result["dense_vecs"]
-
-                rows = [
-                    Chunk(
-                        doc_id=doc["id"],
-                        title=doc.get("title", ""),
-                        url=doc.get("url", ""),
-                        source=doc.get("source", ""),
-                        date=doc.get("date", ""),
-                        content=chunk,
-                        embedding=emb.tolist(),
+                    result = model.encode(
+                        texts,
+                        batch_size=BATCH_SIZE,
+                        return_dense=True,
+                        return_sparse=False,
+                        return_colbert_vecs=False,
                     )
-                    for (doc, chunk), emb in zip(batch, embeddings)
-                ]
-                session.add_all(rows)
-                await session.commit()
+                    embeddings = result["dense_vecs"]
 
-                total_chunks += len(rows)
-                if (i // BATCH_SIZE) % 20 == 0:
-                    print(f"    {i + len(batch)}/{len(pairs)}")
+                    rows = [
+                        Chunk(
+                            doc_id=doc["id"],
+                            title=doc.get("title", ""),
+                            url=doc.get("url", ""),
+                            source=doc.get("source", ""),
+                            date=doc.get("date", ""),
+                            content=chunk,
+                            embedding=emb.tolist(),
+                        )
+                        for (doc, chunk), emb in zip(batch, embeddings)
+                    ]
+                    session.add_all(rows)
+                    await session.commit()
+
+                    total_chunks += len(rows)
+                    pbar.update(len(batch))
+                    pbar.set_postfix(total=total_chunks)
 
     print("\nCreating vector index (IVFFlat)...")
     await create_vector_index(engine)
 
     await engine.dispose()
-    print(f"\nDone — {total_chunks} chunks inserted")
+    elapsed = time.monotonic() - t_start
+    print(f"\nDone — {total_chunks} chunks from {total_docs} docs in {elapsed/60:.1f} min")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--limit", type=int, default=None, help="Max number of docs to ingest (for testing)")
+    parser.add_argument("--reset", action="store_true", help="Drop and recreate the chunks table before ingesting")
     args = parser.parse_args()
-    asyncio.run(ingest_all(limit=args.limit))
+    asyncio.run(ingest_all(limit=args.limit, reset=args.reset))

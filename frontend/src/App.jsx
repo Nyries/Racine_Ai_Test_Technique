@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react'
+import { flushSync } from 'react-dom'
 import styles from './App.module.css'
+
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
 
 function renderText(text) {
   return text.split(/\*\*(.*?)\*\*/g).map((part, i) =>
@@ -35,7 +38,7 @@ function App() {
     ])
 
     try {
-      const res = await fetch('/chat', {
+      const res = await fetch(`${API_URL}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -77,13 +80,15 @@ function App() {
           try { event = JSON.parse(raw) } catch { continue }
 
           if (event.type === 'token') {
-            setMessages(prev => {
-              const copy = [...prev]
-              copy[copy.length - 1] = {
-                ...copy[copy.length - 1],
-                content: copy[copy.length - 1].content + event.text,
-              }
-              return copy
+            flushSync(() => {
+              setMessages(prev => {
+                const copy = [...prev]
+                copy[copy.length - 1] = {
+                  ...copy[copy.length - 1],
+                  content: copy[copy.length - 1].content + event.content,
+                }
+                return copy
+              })
             })
           } else if (event.type === 'sources') {
             setMessages(prev => {

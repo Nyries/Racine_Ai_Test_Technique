@@ -12,6 +12,7 @@ from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 RAW_DIR = Path(__file__).parent.parent / "raw"
 BASE_URL = "https://www.wilsoncenter.org"
@@ -158,18 +159,19 @@ def main() -> None:
     print(f"\n{len(urls)} Middle East articles found.\n")
 
     total = 0
-    for url in urls:
-        try:
-            doc = scrape_article(url)
-            if doc:
-                save_document(doc)
-                total += 1
-                print(f"✓ {doc['title'][:70]}")
-            time.sleep(DELAY_SECONDS)
+    with tqdm(urls, desc="Wilson Center", unit="doc") as pbar:
+        for url in pbar:
+            try:
+                doc = scrape_article(url)
+                if doc:
+                    save_document(doc)
+                    total += 1
+                    pbar.set_postfix(saved=total)
+                time.sleep(DELAY_SECONDS)
 
-        except requests.RequestException as e:
-            print(f"✗ Error on {url}: {e}")
-            time.sleep(DELAY_SECONDS)
+            except requests.RequestException as e:
+                tqdm.write(f"✗ {url}: {e}")
+                time.sleep(DELAY_SECONDS)
 
     print(f"\nDone — {total} articles saved to {RAW_DIR}")
 

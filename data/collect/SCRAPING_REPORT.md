@@ -97,6 +97,38 @@ Acteurs couverts : Israël, Arabie Saoudite, Iran, Turquie, Irak, Syrie, Égypte
 
 ---
 
+## Exécution
+
+### Lancement parallèle (recommandé)
+
+Les 5 scrapers peuvent être lancés simultanément via `scrape_all.py`. Chaque scraper tourne dans un thread séparé et écrit ses logs dans `data/collect/<scraper>.log`.
+
+```bash
+make scrape
+# ou directement :
+python data/collect/scrape_all.py
+```
+
+Suivi en temps réel d'un scraper pendant l'exécution :
+```bash
+# Linux/Mac
+tail -f data/collect/brookings_scraper.log
+# Windows PowerShell
+Get-Content data/collect/brookings_scraper.log -Wait
+```
+
+### Lancement séquentiel (debug)
+
+```bash
+make scrape-sequential
+```
+
+### Affichage
+
+Chaque scraper dispose d'une barre de progression `tqdm` avec vitesse et ETA. En mode parallèle, les sorties sont redirigées vers les fichiers `.log` pour éviter l'interleaving.
+
+---
+
 ## Leçons apprises
 
 - Vérifier la présence de Cloudflare avant de coder un scraper (signe : 403 immédiat même avec headers navigateur)

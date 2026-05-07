@@ -9,6 +9,7 @@ import time
 from pathlib import Path
 
 import requests
+from tqdm import tqdm
 
 RAW_DIR = Path(__file__).parent.parent / "raw"
 API_URL = "https://en.wikipedia.org/w/api.php"
@@ -172,31 +173,31 @@ def main() -> None:
     print("Fetching article titles from categories...")
     all_titles: set[str] = set()
 
-    for category in SEED_CATEGORIES:
-        members = get_category_members(category)
-        new = [t for t in members if t not in all_titles]
-        all_titles.update(members)
-        print(f"  {category}: {len(members)} articles ({len(new)} new, total: {len(all_titles)})")
-        time.sleep(DELAY_SECONDS)
+    with tqdm(SEED_CATEGORIES, desc="Categories", unit="cat") as pbar:
+        for category in pbar:
+            members = get_category_members(category)
+            new = [t for t in members if t not in all_titles]
+            all_titles.update(members)
+            pbar.set_postfix(total=len(all_titles), new=len(new))
+            time.sleep(DELAY_SECONDS)
 
     title_list = sorted(all_titles)
     print(f"\n{len(title_list)} unique articles to fetch.\n")
 
     total = 0
-    for i, title in enumerate(title_list, start=1):
-        try:
-            doc = fetch_article(title)
-            if doc:
-                save_document(doc)
-                total += 1
-                print(f"✓ [{i}/{len(title_list)}] {doc['title'][:70]}")
-            else:
-                print(f"  [{i}/{len(title_list)}] skipped (stub or redirect): {title[:60]}")
-            time.sleep(DELAY_SECONDS)
+    with tqdm(title_list, desc="Wikipedia", unit="doc") as pbar:
+        for title in pbar:
+            try:
+                doc = fetch_article(title)
+                if doc:
+                    save_document(doc)
+                    total += 1
+                    pbar.set_postfix(saved=total)
+                time.sleep(DELAY_SECONDS)
 
-        except Exception as e:
-            print(f"✗ Error on '{title}': {e}")
-            time.sleep(DELAY_SECONDS)
+            except Exception as e:
+                tqdm.write(f"✗ '{title}': {e}")
+                time.sleep(DELAY_SECONDS)
 
     print(f"\nDone — {total} articles saved to {RAW_DIR}")
 

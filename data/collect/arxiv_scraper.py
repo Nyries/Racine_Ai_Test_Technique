@@ -8,6 +8,8 @@ import json
 import time
 from pathlib import Path
 
+from tqdm import tqdm
+
 RAW_DIR = Path(__file__).parent.parent / "raw"
 
 QUERIES = [
@@ -62,19 +64,20 @@ def main() -> None:
     seen_ids = set()
     total = 0
 
-    for query in QUERIES:
-        print(f"\nQuery: {query}")
-        papers = fetch_papers(query)
+    with tqdm(QUERIES, desc="arXiv", unit="query") as pbar:
+        for query in pbar:
+            pbar.set_description(f"arXiv: {query[:40]}")
+            papers = fetch_papers(query)
 
-        for paper in papers:
-            if paper["id"] in seen_ids:
-                continue
-            seen_ids.add(paper["id"])
-            save_paper(paper)
-            total += 1
-            print(f"  ✓ {paper['title'][:70]}")
+            for paper in papers:
+                if paper["id"] in seen_ids:
+                    continue
+                seen_ids.add(paper["id"])
+                save_paper(paper)
+                total += 1
 
-        time.sleep(2)
+            pbar.set_postfix(saved=total)
+            time.sleep(2)
 
     print(f"\nDone — {total} papers saved to {RAW_DIR}")
 

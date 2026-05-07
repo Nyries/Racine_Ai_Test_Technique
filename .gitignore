@@ -25,9 +25,22 @@ data/clean/corpus_*.jsonl
 node_modules/
 frontend/dist/
 
+# Scraper logs
+data/collect/*.log
+
 # OS
 .DS_Store
 Thumbs.db
+
+# CPT — données et checkpoints (trop lourds pour Git)
+cpt/data/
+cpt/checkpoints/
+*.bin
+*.safetensors
+*.pt
+*.ckpt
+wandb/
+runs/
 
 # Terraform
 infra/.terraform/

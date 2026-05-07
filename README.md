@@ -124,16 +124,18 @@ Benchmark sur 30 questions de géopolitique du Moyen-Orient avec mots-clés atte
 |---|---|---|
 | Recall@5 | 0.533 | `make benchmark` |
 | Recall@10 | 0.533 | `make benchmark` |
-| Faithfulness (custom) | _TODO_ | `make benchmark-full` |
-| Answer Relevancy (custom) | _TODO_ | `make benchmark-full` |
-| Latence retrieval p50 | 264 ms | `make benchmark` |
-| Latence retrieval p95 | 2 491 ms | `make benchmark` |
-| Latence reranker p50 | 17 801 ms | `make benchmark` |
-| Latence reranker p95 | 42 058 ms | `make benchmark` |
+| Faithfulness (custom) | 0.388 | `make benchmark-full` |
+| Answer Relevancy (custom) | 0.737 | `make benchmark-full` |
+| Latence retrieval p50 | 259 ms | `make benchmark` |
+| Latence retrieval p95 | 1 408 ms | `make benchmark` |
+| Latence reranker p50 | 19 286 ms | `make benchmark` |
+| Latence reranker p95 | 34 179 ms | `make benchmark` |
 
 > **Note latence reranker** : mesuré sur CPU (BGE-reranker-v2-m3, cross-encoder sur 20 paires). Sur GPU (déploiement OVH), latence estimée ~1-2s p50.
 
 > **Note Recall** : mesuré sur 1 000 docs ingérés (13% du corpus total). Recall@5 = Recall@10 indique que les documents manqués sont absents du top-10 — principalement dû à la couverture partielle du corpus. Sur corpus complet, Recall@10 attendu significativement supérieur.
+
+> **Note Faithfulness** : métrique maison stricte (présence d'un 4-gramme exact dans les sources). Le LLM paraphrase plutôt que copier verbatim — score de 0.388 attendu avec cette approche. Faithfulness réelle (sémantique) estimée significativement supérieure.
 
 **Faithfulness** : fraction de phrases de la réponse dont un quadrigramme apparaît textuellement dans les sources récupérées.  
 **Answer Relevancy** : similarité cosinus (BGE-M3) entre l'embedding de la question et celui de la réponse.

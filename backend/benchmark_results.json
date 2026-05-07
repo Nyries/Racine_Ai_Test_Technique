@@ -1,0 +1,11 @@
+{
+  "recall_at_5": 0.533,
+  "recall_at_10": 0.533,
+  "latency_fast_p50_ms": 259,
+  "latency_fast_p95_ms": 1408,
+  "latency_rerank_p50_ms": 19286,
+  "latency_rerank_p95_ms": 34179,
+  "faithfulness": 0.388,
+  "answer_relevancy": 0.737,
+  "llm_questions": 15
+}

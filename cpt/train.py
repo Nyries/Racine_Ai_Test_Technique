@@ -79,7 +79,7 @@ def main() -> None:
 
     print(f"Loading model: {model_cfg['name']}")
     dtype = torch.bfloat16 if train_cfg["bf16"] else torch.float32
-    model = AutoModelForCausalLM.from_pretrained(model_cfg["name"], torch_dtype=dtype)
+    model = AutoModelForCausalLM.from_pretrained(model_cfg["name"], dtype=dtype)
     if train_cfg.get("gradient_checkpointing"):
         model.gradient_checkpointing_enable()
 

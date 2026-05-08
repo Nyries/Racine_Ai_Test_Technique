@@ -2,8 +2,8 @@ model:
   name: Qwen/Qwen3.5-0.8B-Base
 
 data:
-  train_file: ./data/train.jsonl
-  eval_file: ./data/held_out.jsonl
+  train_file: data/train.jsonl
+  eval_file: data/held_out.jsonl
   # Each document is formatted as "title\n\ntext" by prepare_corpus.py.
   # Documents longer than max_seq_length are truncated.
   # Token budget: ~7 016 docs × ~1 024 tokens ≈ 7.2M tokens seen per epoch
@@ -12,15 +12,15 @@ data:
 
 training:
   seed: 42
-  output_dir: ./checkpoints
+  output_dir: checkpoints
 
   # ── Batch & steps ────────────────────────────────────────────────────────────
   # RTX 4090 (24 GB) in bf16 with gradient_checkpointing:
   #   per_device × grad_accum = effective_batch = 32 sequences = 32 768 tokens/step
   #   steps/epoch = ceil(7 016 / 32) ≈ 220 optimizer steps
-  per_device_train_batch_size: 8
-  gradient_accumulation_steps: 4
-  per_device_eval_batch_size: 8
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 16
+  per_device_eval_batch_size: 2
   num_train_epochs: 1
 
   # ── Optimisation ─────────────────────────────────────────────────────────────

@@ -27,6 +27,7 @@ services:
       # Les modèles HuggingFace (BGE-M3, reranker) sont mis en cache ici
       # pour ne pas être retéléchargés à chaque redémarrage
       - hf_cache:/app/.cache/huggingface
+      - ./data:/data
     depends_on:
       db:
         condition: service_healthy

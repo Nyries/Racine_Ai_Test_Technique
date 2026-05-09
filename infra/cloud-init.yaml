@@ -1,0 +1,51 @@
+#cloud-config
+package_update: true
+package_upgrade: false
+
+packages:
+  - ca-certificates
+  - curl
+  - gnupg
+  - git
+  - apt-transport-https
+  - debian-keyring
+  - debian-archive-keyring
+
+runcmd:
+  # ── Docker ────────────────────────────────────────────────────────────────
+  - install -m 0755 -d /etc/apt/keyrings
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+  - chmod a+r /etc/apt/keyrings/docker.asc
+  - echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable" > /etc/apt/sources.list.d/docker.list
+  - apt-get update -q
+  - apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+  # ── Caddy (reverse proxy + TLS Let's Encrypt automatique) ─────────────────
+  - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+  - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
+  - apt-get update -q && apt-get install -y caddy
+
+  # ── Application ───────────────────────────────────────────────────────────
+  - git clone https://github.com/TON_USERNAME/TON_REPO.git /app
+
+  # Secrets injectés par Terraform — jamais écrits en dur dans ce fichier
+  - |
+    cat > /app/.env << 'ENVEOF'
+    POSTGRES_PASSWORD=${postgres_password}
+    OPENROUTER_API_KEY=${openrouter_api_key}
+    DATABASE_URL=${database_url}
+    ENVEOF
+
+  # Lance backend + frontend uniquement (la DB managée OVH remplace le service "db")
+  - cd /app && docker compose up -d backend frontend
+
+  # ── Caddy : proxy vers le frontend nginx, TLS automatique ─────────────────
+  - |
+    cat > /etc/caddy/Caddyfile << CADDYEOF
+    ${domain_name} {
+      reverse_proxy localhost:3000
+    }
+    CADDYEOF
+
+  - systemctl restart caddy
+  - systemctl enable caddy

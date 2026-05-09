@@ -1,0 +1,7 @@
+{
+  "base_perplexity": 16.083,
+  "ours_perplexity": 14.115,
+  "delta": 1.968,
+  "delta_pct": 12.24,
+  "subset": 200
+}

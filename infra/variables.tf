@@ -1,22 +1,10 @@
 variable "ovh_project_id" {
-  description = "OVH Public Cloud project ID (visible in the OVH console)"
+  description = "OVH Public Cloud project ID (OS_TENANT_ID in openrc.sh)"
   type        = string
-}
-
-variable "region" {
-  description = "OVH region for compute resources"
-  type        = string
-  default     = "GRA11"
-}
-
-variable "db_region" {
-  description = "OVH region for managed PostgreSQL"
-  type        = string
-  default     = "GRA"
 }
 
 variable "vm_flavor" {
-  description = "VM instance flavor (b2-15 = 4 vCPU, 15 GB RAM — needed to load BGE-M3 and reranker models)"
+  description = "VM instance flavor (b2-15 = 4 vCPU, 15 GB RAM)"
   type        = string
   default     = "b2-15"
 }
@@ -27,12 +15,12 @@ variable "ssh_public_key" {
 }
 
 variable "domain_name" {
-  description = "Application domain name (e.g. rag.my-domain.com or a nip.io subdomain)"
+  description = "Application domain name (e.g. rag.mon-domaine.duckdns.org)"
   type        = string
 }
 
 variable "postgres_password" {
-  description = "PostgreSQL password"
+  description = "PostgreSQL password for the Docker Compose db container"
   type        = string
   sensitive   = true
 }
@@ -44,7 +32,7 @@ variable "openrouter_api_key" {
 }
 
 variable "artifacts_bucket" {
-  description = "OVH Object Storage bucket name for artifacts (models, datasets, long-term logs)"
+  description = "OVH Object Storage bucket name for artifacts"
   type        = string
   default     = "rag-artifacts"
 }

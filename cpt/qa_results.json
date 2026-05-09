@@ -1,0 +1,206 @@
+{
+  "base": {
+    "accuracy": 0.64,
+    "correct": 32,
+    "total": 50,
+    "errors": [
+      {
+        "id": 1,
+        "predicted": "A",
+        "expected": "B"
+      },
+      {
+        "id": 3,
+        "predicted": "D",
+        "expected": "B"
+      },
+      {
+        "id": 8,
+        "predicted": "D",
+        "expected": "B"
+      },
+      {
+        "id": 10,
+        "predicted": "C",
+        "expected": "D"
+      },
+      {
+        "id": 11,
+        "predicted": "B",
+        "expected": "A"
+      },
+      {
+        "id": 13,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 14,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 17,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 22,
+        "predicted": "A",
+        "expected": "B"
+      },
+      {
+        "id": 25,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 26,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 28,
+        "predicted": "D",
+        "expected": "B"
+      },
+      {
+        "id": 35,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 42,
+        "predicted": "A",
+        "expected": "B"
+      },
+      {
+        "id": 45,
+        "predicted": "B",
+        "expected": "D"
+      },
+      {
+        "id": 47,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 48,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 50,
+        "predicted": "D",
+        "expected": "B"
+      }
+    ]
+  },
+  "ours": {
+    "accuracy": 0.6,
+    "correct": 30,
+    "total": 50,
+    "errors": [
+      {
+        "id": 3,
+        "predicted": "D",
+        "expected": "B"
+      },
+      {
+        "id": 8,
+        "predicted": "D",
+        "expected": "B"
+      },
+      {
+        "id": 10,
+        "predicted": "C",
+        "expected": "D"
+      },
+      {
+        "id": 11,
+        "predicted": "B",
+        "expected": "A"
+      },
+      {
+        "id": 13,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 17,
+        "predicted": "A",
+        "expected": "C"
+      },
+      {
+        "id": 22,
+        "predicted": "D",
+        "expected": "B"
+      },
+      {
+        "id": 25,
+        "predicted": "A",
+        "expected": "C"
+      },
+      {
+        "id": 26,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 28,
+        "predicted": "A",
+        "expected": "B"
+      },
+      {
+        "id": 29,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 35,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 38,
+        "predicted": "A",
+        "expected": "B"
+      },
+      {
+        "id": 41,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 42,
+        "predicted": "C",
+        "expected": "B"
+      },
+      {
+        "id": 44,
+        "predicted": "A",
+        "expected": "B"
+      },
+      {
+        "id": 45,
+        "predicted": "B",
+        "expected": "D"
+      },
+      {
+        "id": 47,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 48,
+        "predicted": "B",
+        "expected": "C"
+      },
+      {
+        "id": 49,
+        "predicted": "A",
+        "expected": "B"
+      }
+    ]
+  }
+}

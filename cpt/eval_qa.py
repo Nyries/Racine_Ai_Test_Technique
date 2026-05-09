@@ -15,7 +15,7 @@ import json
 
 import torch
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 from qa_questions import QUESTIONS
 
@@ -51,10 +51,17 @@ def score_question(
     return max(scores, key=scores.__getitem__)
 
 
-def evaluate(model_id: str, dtype: torch.dtype, device: str) -> dict:
+def evaluate(
+    model_id: str,
+    dtype: torch.dtype,
+    device: str,
+    tokenizer: AutoTokenizer | None = None,
+    config=None,
+) -> dict:
     print(f"\nLoading {model_id}")
-    tokenizer = AutoTokenizer.from_pretrained(model_id)
-    model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=dtype).to(device)
+    if tokenizer is None:
+        tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model = AutoModelForCausalLM.from_pretrained(model_id, config=config, dtype=dtype).to(device)
     model.eval()
 
     choice_token_ids = get_choice_token_ids(tokenizer)
@@ -90,11 +97,16 @@ def main() -> None:
     dtype = torch.bfloat16 if torch.cuda.is_available() else torch.float32
     print(f"Device: {device}  |  dtype: {dtype}  |  questions: {len(QUESTIONS)}")
 
+    base_tokenizer = AutoTokenizer.from_pretrained(args.base)
+    base_config = AutoConfig.from_pretrained(args.base)
+
     results = {}
-    results["base"] = evaluate(args.base, dtype, device)
+    results["base"] = evaluate(args.base, dtype, device, tokenizer=base_tokenizer)
 
     if not args.base_only and args.finetuned:
-        results["ours"] = evaluate(args.finetuned, dtype, device)
+        results["ours"] = evaluate(
+            args.finetuned, dtype, device, tokenizer=base_tokenizer, config=base_config
+        )
 
         delta = results["ours"]["accuracy"] - results["base"]["accuracy"]
         print("\n" + "=" * 55)

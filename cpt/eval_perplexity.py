@@ -13,7 +13,7 @@ import math
 
 import torch
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 
 
 def compute_perplexity(
@@ -80,11 +80,15 @@ def main() -> None:
     print(f"Loaded {len(texts)} documents\n")
 
     tokenizer = AutoTokenizer.from_pretrained(args.base)
+    base_config = AutoConfig.from_pretrained(args.base)
     results = {}
 
     for label, model_id in [("base", args.base), ("ours", args.finetuned)]:
         print(f"[{label}] Loading {model_id}")
-        model = AutoModelForCausalLM.from_pretrained(model_id, torch_dtype=dtype).to(device)
+        config = base_config if label == "ours" else None
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, config=config, dtype=dtype
+        ).to(device)
         ppl = compute_perplexity(model, tokenizer, texts, args.max_seq_length, device)
         results[label] = round(ppl, 3)
         print(f"[{label}] Perplexity = {ppl:.3f}\n")

@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 
 from app.chat import stream_chat
 from app.config import get_settings
+from app.ingest import create_tables
 from app.models import ChatRequest, ChatResponse, HealthResponse
 
 
@@ -24,6 +25,7 @@ async def lifespan(app: FastAPI):
     settings = get_settings()
     _engine = create_async_engine(settings.database_url, pool_size=10, max_overflow=20)
     _session_factory = async_sessionmaker(_engine, expire_on_commit=False)
+    await create_tables(_engine)
     yield
     await _engine.dispose()
 

@@ -28,6 +28,7 @@ runcmd:
 
   # ── Application ───────────────────────────────────────────────────────────
   - git clone https://github.com/Nyries/Racine_Ai_Test_Technique.git /app
+  - chown -R ubuntu:ubuntu /app
 
   # Secrets injectés par Terraform
   - |

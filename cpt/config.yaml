@@ -42,4 +42,4 @@ training:
   save_total_limit: 2            # keeps only the 2 best checkpoints
 
   # ── Loss curve export ────────────────────────────────────────────────────────
-  loss_curve_png: ./loss_curve.png
+  loss_curve_png: /tmp/loss_curve.png

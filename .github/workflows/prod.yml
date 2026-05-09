@@ -19,6 +19,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set image names (lowercase)
+        run: |
+          REPO=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+          echo "BACKEND_IMAGE=ghcr.io/${REPO}/rag-backend:${{ github.sha }}" >> $GITHUB_ENV
+          echo "FRONTEND_IMAGE=ghcr.io/${REPO}/rag-frontend:${{ github.sha }}" >> $GITHUB_ENV
+
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -26,27 +32,21 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push backend
-        id: meta-backend
         run: |
-          IMAGE="ghcr.io/${{ github.repository }}/rag-backend:${{ github.sha }}"
-          docker build -t "$IMAGE" ./backend
-          docker push "$IMAGE"
-          echo "tags=$IMAGE" >> "$GITHUB_OUTPUT"
+          docker build -t "$BACKEND_IMAGE" ./backend
+          docker push "$BACKEND_IMAGE"
 
       - name: Build and push frontend
-        id: meta-frontend
         run: |
-          IMAGE="ghcr.io/${{ github.repository }}/rag-frontend:${{ github.sha }}"
-          docker build -t "$IMAGE" ./frontend
-          docker push "$IMAGE"
-          echo "tags=$IMAGE" >> "$GITHUB_OUTPUT"
+          docker build -t "$FRONTEND_IMAGE" ./frontend
+          docker push "$FRONTEND_IMAGE"
 
       - uses: sigstore/cosign-installer@v3
 
       - name: Sign images
         run: |
-          cosign sign --yes "ghcr.io/${{ github.repository }}/rag-backend:${{ github.sha }}"
-          cosign sign --yes "ghcr.io/${{ github.repository }}/rag-frontend:${{ github.sha }}"
+          cosign sign --yes "$BACKEND_IMAGE"
+          cosign sign --yes "$FRONTEND_IMAGE"
 
   deploy:
     runs-on: ubuntu-latest
@@ -56,18 +56,18 @@ jobs:
       - uses: appleboy/ssh-action@v1
         env:
           SHA: ${{ github.sha }}
-          REPO: ${{ github.repository }}
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GHCR_USER: ${{ github.actor }}
         with:
           host: ${{ secrets.VM_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: SHA,REPO,GHCR_TOKEN,GHCR_USER
+          envs: SHA,GHCR_TOKEN,GHCR_USER
           script: |
             set -e
-            BACKEND_IMAGE="ghcr.io/${REPO}/rag-backend:${SHA}"
-            FRONTEND_IMAGE="ghcr.io/${REPO}/rag-frontend:${SHA}"
+            REPO_FULL=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+            BACKEND_IMAGE="ghcr.io/${REPO_FULL}/rag-backend:${SHA}"
+            FRONTEND_IMAGE="ghcr.io/${REPO_FULL}/rag-frontend:${SHA}"
 
             # Save current images for rollback
             grep '^BACKEND_IMAGE=' /app/.env > /app/.prev_images 2>/dev/null || true

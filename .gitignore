@@ -46,3 +46,7 @@ runs/
 infra/.terraform/
 infra/*.tfstate
 infra/*.tfstate.backup
+infra/*.tfvars
+infra/setup-env.sh
+cosign.key
+cosign.pub

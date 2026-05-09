@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: ragdb
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rag_user -d ragdb"]
       interval: 10s
@@ -19,6 +21,7 @@ services:
   backend:
     build:
       context: ./backend
+    image: ${BACKEND_IMAGE:-rag-backend:local}
     environment:
       # "db" est le nom du service ci-dessus, résolu automatiquement dans le réseau Docker
       DATABASE_URL: postgresql+asyncpg://rag_user:${POSTGRES_PASSWORD}@db:5432/ragdb
@@ -38,6 +41,7 @@ services:
   frontend:
     build:
       context: ./frontend
+    image: ${FRONTEND_IMAGE:-rag-frontend:local}
     depends_on:
       - backend
     ports:

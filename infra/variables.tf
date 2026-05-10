@@ -4,9 +4,9 @@ variable "ovh_project_id" {
 }
 
 variable "vm_flavor" {
-  description = "VM instance flavor (b3-16 = 4 vCPU, 15 GB RAM)"
+  description = "VM instance flavor (b2-15 = 4 vCPU, 15 GB RAM)"
   type        = string
-  default     = "b3-16"
+  default     = "b2-15"
 }
 
 variable "ssh_public_key" {

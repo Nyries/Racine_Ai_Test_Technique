@@ -148,11 +148,21 @@ Continuous pre-training sur le corpus nettoyé (65 MB). Split train/held-out eff
 
 | Métrique | Base Qwen3.5-0.8B | Notre modèle | Delta |
 |---|---|---|---|
-| Perplexité held-out | _TODO_ | _TODO_ | _TODO_ |
-| Domain QA accuracy (50 q) | _TODO_ | _TODO_ | _TODO_ |
-| Hellaswag-200 accuracy | _TODO_ | _TODO_ | _TODO_ |
+| Perplexité held-out (200 docs) | 16.083 | 14.115 | **-1.97 (-12.2%)** |
+| Domain QA accuracy (50 q) | 64.0% | 60.0% | -4.0% |
+| Hellaswag-200 accuracy | 44.5% | 42.0% | -2.5% |
 
-Modèle disponible sur HuggingFace : _TODO_
+Reproduire :
+```bash
+cd cpt
+python eval_perplexity.py --finetuned ./checkpoints/checkpoint-220
+python eval_qa.py --finetuned ./checkpoints/checkpoint-220
+python eval_hellaswag.py --finetuned ./checkpoints/checkpoint-220
+```
+
+> **Note Domain QA / Hellaswag** : légère régression attendue après 1 époque de CPT sur texte brut (catastrophic forgetting). Le CPT optimise la log-probabilité du domaine, pas le raisonnement QCM. La perplexité (-12.2%) confirme l'adaptation au domaine ; les régressions QA (-4%) et Hellaswag (-2.5%) sont dans la fourchette documentée pour un run 1-époque sans replay généraliste.
+
+Modèle disponible sur HuggingFace : [Nyries/qwen3-0.8b-middle-east-cpt](https://huggingface.co/Nyries/qwen3-0.8b-middle-east-cpt)
 
 ---
 

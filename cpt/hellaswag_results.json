@@ -1,0 +1,12 @@
+{
+  "base": {
+    "accuracy": 0.445,
+    "correct": 89,
+    "total": 200
+  },
+  "ours": {
+    "accuracy": 0.42,
+    "correct": 84,
+    "total": 200
+  }
+}

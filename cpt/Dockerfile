@@ -8,7 +8,7 @@ RUN pip install --no-cache-dir torch==2.5.1 --index-url https://download.pytorch
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY train.py config.yaml eval_perplexity.py eval_qa.py qa_questions.py prepare_corpus.py ./
+COPY train.py config.yaml eval_perplexity.py eval_qa.py eval_hellaswag.py qa_questions.py prepare_corpus.py ./
 COPY data/ ./data/
 
 ENV PYTHONUNBUFFERED=1

@@ -68,23 +68,20 @@ jobs:
             FRONTEND_IMAGE="ghcr.io/${REPO_FULL}/rag-frontend:${SHA}"
 
             # Save current images for rollback
-            grep '^BACKEND_IMAGE=' /app/.env > /app/.prev_images 2>/dev/null || true
-            grep '^FRONTEND_IMAGE=' /app/.env >> /app/.prev_images 2>/dev/null || true
+            cp /app/.image-tags /app/.prev_images 2>/dev/null || true
 
             # Pull new images
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             docker pull "$BACKEND_IMAGE"
             docker pull "$FRONTEND_IMAGE"
 
-            # Update image tags in .env
+            # Update image tags tracker
             sudo git -C /app pull
-            sed -i '/^BACKEND_IMAGE/d' /app/.env
-            sed -i '/^FRONTEND_IMAGE/d' /app/.env
-            echo "BACKEND_IMAGE=$BACKEND_IMAGE" >> /app/.env
-            echo "FRONTEND_IMAGE=$FRONTEND_IMAGE" >> /app/.env
+            echo "BACKEND_IMAGE=$BACKEND_IMAGE" > /app/.image-tags
+            echo "FRONTEND_IMAGE=$FRONTEND_IMAGE" >> /app/.image-tags
 
             BACKEND_IMAGE="$BACKEND_IMAGE" FRONTEND_IMAGE="$FRONTEND_IMAGE" \
-              docker compose -f /app/docker-compose.yml --env-file /app/.env up -d --no-deps backend frontend
+              docker compose -f /app/docker-compose.yml --env-file /run/secrets/app.env up -d --no-deps backend frontend
 
   smoke-test:
     runs-on: ubuntu-latest
@@ -103,13 +100,12 @@ jobs:
           host: ${{ secrets.VM_IP }}
           username: ubuntu
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           script: |
             set -e
             if [ -f /app/.prev_images ]; then
               source /app/.prev_images
-              sed -i '/^BACKEND_IMAGE/d' /app/.env
-              sed -i '/^FRONTEND_IMAGE/d' /app/.env
-              cat /app/.prev_images >> /app/.env
+              cp /app/.prev_images /app/.image-tags
               BACKEND_IMAGE="$BACKEND_IMAGE" FRONTEND_IMAGE="$FRONTEND_IMAGE" \
-                docker compose -f /app/docker-compose.yml --env-file /app/.env up -d --no-deps backend frontend
+                docker compose -f /app/docker-compose.yml --env-file /run/secrets/app.env up -d --no-deps backend frontend
             fi

@@ -101,7 +101,7 @@ async def stream_chat(
                         token = chunk["choices"][0]["delta"].get("content", "")
                         if token:
                             yield _sse({"type": "token", "content": token})
-                    except (KeyError, json.JSONDecodeError):
+                    except (KeyError, IndexError, json.JSONDecodeError):
                         continue
 
     except httpx.TimeoutException:

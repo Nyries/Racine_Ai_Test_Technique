@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from app.chat import stream_chat
 from app.config import get_settings
 from app.ingest import create_tables
-from app.models import ChatRequest, ChatResponse, HealthResponse
+from app.models import ChatRequest, HealthResponse
 
 
 # ---------------------------------------------------------------------------

@@ -50,7 +50,17 @@ runcmd:
   - |
     cat > /etc/caddy/Caddyfile << CADDYEOF
     ${domain_name} {
-      reverse_proxy localhost:3000
+      handle /chat {
+        reverse_proxy localhost:8000 {
+          flush_interval -1
+        }
+      }
+      handle /health {
+        reverse_proxy localhost:8000
+      }
+      handle {
+        reverse_proxy localhost:3000
+      }
     }
     CADDYEOF
 

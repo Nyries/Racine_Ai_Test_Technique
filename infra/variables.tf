@@ -36,3 +36,21 @@ variable "artifacts_bucket" {
   type        = string
   default     = "rag-artifacts"
 }
+
+variable "ovh_app_key" {
+  description = "OVH Application Key — read-only access to OKMS secrets"
+  type        = string
+  sensitive   = true
+}
+
+variable "ovh_app_secret" {
+  description = "OVH Application Secret"
+  type        = string
+  sensitive   = true
+}
+
+variable "ovh_consumer_key" {
+  description = "OVH Consumer Key"
+  type        = string
+  sensitive   = true
+}

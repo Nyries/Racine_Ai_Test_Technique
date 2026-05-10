@@ -6,6 +6,10 @@ terraform {
       source  = "terraform-provider-openstack/openstack"
       version = ">= 2.1"
     }
+    ovh = {
+      source  = "ovh/ovh"
+      version = ">= 0.40"
+    }
   }
 
   # Remote state stored in OVH Object Storage (S3-compatible)
@@ -23,6 +27,12 @@ terraform {
     skip_requesting_account_id  = true
     use_path_style              = true
   }
+}
+
+# OVH provider — for Secret Manager (OKMS)
+# Credentials from env vars: OVH_ENDPOINT, OVH_APPLICATION_KEY, OVH_APPLICATION_SECRET, OVH_CONSUMER_KEY
+provider "ovh" {
+  endpoint = "ovh-eu"
 }
 
 # Storage provider — region GRA (Object Storage)

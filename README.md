@@ -173,10 +173,36 @@ Application déployée sur OVH (cloud souverain européen) : _TODO_
 Infrastructure as Code : Terraform — `terraform apply` reconstruit l'environnement complet depuis zéro.
 
 ```bash
-# Redéployer
 cd infra
 terraform init
 terraform apply
+```
+
+La VM est configurée automatiquement via cloud-init (Docker, Caddy, clone du repo, démarrage des containers). Attendre la fin avec :
+
+```bash
+ssh ubuntu@<vm-ip> "sudo cloud-init status --wait"
+```
+
+### Copier le corpus
+
+Le corpus nettoyé n'est pas versionné dans Git (fichiers trop lourds). Après chaque recréation de VM, copier les shards manuellement :
+
+```bash
+# Créer le dossier sur la VM
+ssh ubuntu@<vm-ip> "mkdir -p /app/data/clean"
+
+# Copier les shards depuis la machine locale
+scp data/clean/*.jsonl ubuntu@<vm-ip>:/app/data/clean/
+```
+
+### Lancer l'ingestion
+
+```bash
+ssh ubuntu@<vm-ip>
+tmux new -s ingest
+docker exec -it <backend-container> python -m app.ingest --limit 200
+# Ctrl+B puis D pour détacher tmux
 ```
 
 ---

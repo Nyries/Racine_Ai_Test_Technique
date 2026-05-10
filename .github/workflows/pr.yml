@@ -113,6 +113,7 @@ jobs:
           OS_USERNAME: ${{ secrets.OS_USERNAME }}
           OS_PASSWORD: ${{ secrets.OS_PASSWORD }}
           OS_TENANT_ID: ${{ secrets.OS_TENANT_ID }}
+          TF_VAR_ovh_project_id: ${{ secrets.OS_TENANT_ID }}
           TF_VAR_ssh_public_key: ${{ secrets.SSH_PUBLIC_KEY }}
           TF_VAR_domain_name: ${{ vars.DOMAIN_NAME }}
           TF_VAR_postgres_password: ${{ secrets.POSTGRES_PASSWORD }}

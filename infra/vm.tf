@@ -16,13 +16,9 @@ resource "openstack_compute_instance_v2" "app" {
   security_groups = ["default"]
 
   user_data = templatefile("${path.module}/cloud-init.yaml", {
-    ovh_app_key          = var.ovh_app_key
-    ovh_app_secret       = var.ovh_app_secret
-    ovh_consumer_key     = var.ovh_consumer_key
-    okms_id              = ovh_okms.rag.id
-    postgres_secret_id   = ovh_okms_secret.postgres_password.id
-    openrouter_secret_id = ovh_okms_secret.openrouter_api_key.id
-    domain_name          = var.domain_name
+    postgres_password  = var.postgres_password
+    openrouter_api_key = var.openrouter_api_key
+    domain_name        = var.domain_name
   })
 
   # "Ext-Net" is OVH's public network — assigns a public IP to the VM

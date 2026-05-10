@@ -10,7 +10,6 @@ packages:
   - apt-transport-https
   - debian-keyring
   - debian-archive-keyring
-  - python3-pip
 
 runcmd:
   # ── Docker ────────────────────────────────────────────────────────────────
@@ -27,49 +26,23 @@ runcmd:
   - curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | tee /etc/apt/sources.list.d/caddy-stable.list
   - apt-get update -q && apt-get install -y caddy
 
-  # ── OVH Python client (pour fetch les secrets depuis OKMS) ────────────────
-  - pip3 install ovh --break-system-packages
-
   # ── Application ───────────────────────────────────────────────────────────
   - git clone https://github.com/Nyries/Racine_Ai_Test_Technique.git /app
   - chown -R ubuntu:ubuntu /app
 
-  # Fetch secrets depuis OVH OKMS — aucun fichier .env écrit sur le disque
+  # Secrets écrits dans /run/secrets/ (tmpfs — RAM uniquement, jamais sur disque)
+  - mkdir -p /run/secrets
+  - chmod 700 /run/secrets
   - |
-    python3 << 'PYEOF'
-    import ovh
-    import subprocess
-    import os
+    cat > /run/secrets/app.env << 'ENVEOF'
+    POSTGRES_PASSWORD=${postgres_password}
+    OPENROUTER_API_KEY=${openrouter_api_key}
+    DATABASE_URL=postgresql+asyncpg://rag_user:${postgres_password}@db:5432/ragdb
+    ENVEOF
+  - chmod 400 /run/secrets/app.env
 
-    client = ovh.Client(
-        endpoint='ovh-eu',
-        application_key='${ovh_app_key}',
-        application_secret='${ovh_app_secret}',
-        consumer_key='${ovh_consumer_key}',
-    )
-
-    okms_id = '${okms_id}'
-
-    def get_secret(secret_id):
-        versions = client.get(f'/v2/okms/resource/{okms_id}/secret/{secret_id}/version')
-        version_id = versions[0]['id']
-        version = client.get(f'/v2/okms/resource/{okms_id}/secret/{secret_id}/version/{version_id}')
-        return version['data']['value']
-
-    postgres_password = get_secret('${postgres_secret_id}')
-    openrouter_api_key = get_secret('${openrouter_secret_id}')
-
-    env = os.environ.copy()
-    env['POSTGRES_PASSWORD'] = postgres_password
-    env['OPENROUTER_API_KEY'] = openrouter_api_key
-    env['DATABASE_URL'] = f'postgresql+asyncpg://rag_user:{postgres_password}@db:5432/ragdb'
-
-    subprocess.run(
-        ['docker', 'compose', '-f', '/app/docker-compose.yml', 'up', '-d'],
-        env=env,
-        check=True
-    )
-    PYEOF
+  # Démarrage des containers avec les secrets
+  - docker compose --env-file /run/secrets/app.env -f /app/docker-compose.yml up -d
 
   # ── Caddy : reverse proxy vers le frontend, TLS automatique ───────────────
   - |

@@ -40,3 +40,33 @@ histogram_quantile(0.95,
 | BackendHighErrorRate | taux erreur > 5% pendant 2min | `infra/alerts/error-rate.yaml` |
 | BackendHighLatencyP95 | p95 > 90s pendant 5min | `infra/alerts/latency-p95.yaml` |
 | VectorStoreDown | /health retourne 500 pendant 1min | `infra/alerts/vector-store-down.yaml` |
+
+---
+
+## Action si épuisement du budget d'erreur
+
+### SLO 1 — Disponibilité épuisée (< 99%)
+
+**Seuil d'alerte** : budget consommé à 50% → action préventive. Budget consommé à 100% → freeze des déploiements.
+
+**Actions immédiates :**
+1. Consulter le runbook [`runbook-500.md`](runbook-500.md) pour identifier la cause.
+2. Freeze des déploiements non critiques jusqu'à reconstitution du budget.
+3. Si indisponibilité > 1h consécutive : escalader, communiquer aux utilisateurs.
+
+**Communication :**
+- Message sur la page de statut : "Le service RAG rencontre des difficultés. Nos équipes travaillent à la résolution."
+- Mise à jour toutes les 30 minutes jusqu'à résolution.
+
+### SLO 2 — Latence épuisée (p95 > 90s)
+
+**Seuil d'alerte** : budget consommé à 50% → investigation. Budget consommé à 100% → freeze des déploiements.
+
+**Actions immédiates :**
+1. Vérifier les métriques `rag_reranker_seconds` et `rag_llm_first_token_seconds` — identifier le goulot.
+2. Si reranker : envisager de réduire le top-k (20 → 10) en configuration.
+3. Si LLM : consulter [`runbook-rate-limit.md`](runbook-rate-limit.md).
+4. Freeze des déploiements jusqu'à stabilisation.
+
+**Communication :**
+- Message aux utilisateurs : "Les réponses peuvent être plus lentes que d'habitude. Merci de votre patience."

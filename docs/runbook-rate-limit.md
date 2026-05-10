@@ -45,3 +45,13 @@ docker compose up -d backend
 
 ### Long terme : passer au tier payant
 Ajouter des crédits OpenRouter pour lever les limites de débit.
+
+## Communication
+
+**Pendant l'incident :**
+- Le frontend affiche déjà un message d'erreur explicite à l'utilisateur ("LLM rate limit reached — please retry in a moment"). Aucune communication supplémentaire nécessaire pour un incident court (< 5 minutes).
+- Si persistant (> 15 minutes) : notifier — "Le service LLM est temporairement saturé. Les réponses reprennent progressivement."
+
+**Après résolution :**
+- Aucun post-mortem requis si l'incident est lié au free tier OpenRouter (comportement attendu).
+- Si lié à une clé épuisée : documenter la rotation dans le README et vérifier le processus de renouvellement.

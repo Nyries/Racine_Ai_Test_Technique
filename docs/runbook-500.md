@@ -58,3 +58,13 @@ BACKEND_IMAGE=ghcr.io/nyries/racine_ai_test_technique/backend:<sha-précédent> 
 ## Escalade
 
 Si non résolu après 15 minutes → vérifier les GitHub Actions pour un déploiement récent qui aurait introduit une régression.
+
+## Communication
+
+**Pendant l'incident :**
+- Si indisponibilité > 5 minutes : notifier les utilisateurs actifs — "Le service est momentanément indisponible. Nos équipes travaillent à la résolution."
+- Mise à jour de statut toutes les 15 minutes.
+
+**Après résolution :**
+- Message de résolution : "Le service est rétabli. Cause : [résumé]. Mesures prises : [actions]."
+- Post-mortem si l'incident a duré plus de 30 minutes ou si le SLO d'availability a été impacté.

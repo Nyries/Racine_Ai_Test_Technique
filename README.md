@@ -168,7 +168,7 @@ Modèle disponible sur HuggingFace : [Nyries/qwen3-0.8b-middle-east-cpt](https:/
 
 ## Déploiement
 
-Application déployée sur OVH (cloud souverain européen) : _TODO_
+Application déployée sur OVH (cloud souverain européen) : **https://rag-geopolitique.duckdns.org/**
 
 Infrastructure as Code : Terraform — `terraform apply` reconstruit l'environnement complet depuis zéro.
 
@@ -177,6 +177,25 @@ cd infra
 terraform init
 terraform apply
 ```
+
+### Secrets GitHub Actions requis
+
+Pour que les pipelines CI/CD tournent, les secrets et variables suivants doivent être configurés dans **Settings → Secrets and variables → Actions** du repo GitHub :
+
+| Nom | Type | Description |
+|---|---|---|
+| `VM_IP` | Secret | IP publique de la VM OVH |
+| `SSH_PRIVATE_KEY` | Secret | Clé privée SSH correspondant à la clé publique dans `infra/terraform.tfvars` |
+| `SSH_KNOWN_HOSTS` | Secret | Empreinte de la VM (`ssh-keyscan <VM_IP>`) |
+| `GRAFANA_PROM_URL` | Secret | URL remote write Prometheus Grafana Cloud |
+| `GRAFANA_PROM_USER` | Secret | Username Prometheus Grafana Cloud |
+| `GRAFANA_PROM_PASSWORD` | Secret | Token Prometheus Grafana Cloud |
+| `GRAFANA_LOKI_URL` | Secret | URL push Loki Grafana Cloud |
+| `GRAFANA_LOKI_USER` | Secret | Username Loki Grafana Cloud |
+| `GRAFANA_LOKI_PASSWORD` | Secret | Token Loki Grafana Cloud |
+| `DOMAIN_NAME` | Variable | `rag-geopolitique.duckdns.org` |
+
+Les secrets applicatifs (`POSTGRES_PASSWORD`, `OPENROUTER_API_KEY`) sont injectés via cloud-init au démarrage de la VM dans `/run/secrets/app.env` (tmpfs RAM, jamais sur disque). Ils ne transitent pas par GitHub Actions.
 
 La VM est configurée automatiquement via cloud-init (Docker, Caddy, clone du repo, démarrage des containers). Attendre la fin avec :
 
@@ -227,6 +246,7 @@ Ce projet a été développé avec **Claude Code** (Anthropic) comme assistant d
 
 | Service | Coût |
 |---|---|
-| OVH AI Training (CPT) | _TODO_ |
-| OVH infrastructure (déploiement) | _TODO_ |
+| OVH AI Training (CPT) | ~9 $ |
+| OVH infrastructure (VM + réseau) | inclus ci-dessus |
 | OpenRouter (LLM free tier) | 0 € |
+| **Total** | **~9 $** |

@@ -16,9 +16,13 @@ from dataclasses import dataclass
 from FlagEmbedding import BGEM3FlagModel, FlagReranker
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
+from opentelemetry import trace
 
 from app.config import get_settings
 from app.models import Source
+from app.observability import EMBEDDING_LATENCY, RAG_ERRORS, RERANKER_LATENCY, timed
+
+tracer = trace.get_tracer("rag.retriever")
 
 # ---------------------------------------------------------------------------
 # ML model singletons
@@ -121,32 +125,32 @@ def _rerank(question: str, candidates: list[_Candidate], top_n: int) -> list[_Ca
 async def retrieve(question: str, session: AsyncSession, rerank: bool = True) -> list[Source]:
     settings = get_settings()
 
-    # 1. Embed the question
-    model = _get_embed_model()
-    result = model.encode([question], return_dense=True, return_sparse=False, return_colbert_vecs=False)
-    query_vec = result["dense_vecs"][0].tolist()
+    with tracer.start_as_current_span("rag.retrieve") as span:
+        span.set_attribute("question.length", len(question))
 
-    # 2. Dense + sparse search
-    dense = await _dense_search(session, query_vec, settings.retrieval_top_k)
-    sparse = await _sparse_search(session, question, settings.retrieval_top_k)
+        with tracer.start_as_current_span("rag.embed_query"):
+            with timed(EMBEDDING_LATENCY):
+                model = _get_embed_model()
+                result = model.encode([question], return_dense=True, return_sparse=False, return_colbert_vecs=False)
+                query_vec = result["dense_vecs"][0].tolist()
 
-    # 3. RRF fusion
-    fused = _rrf([dense, sparse])
+        with tracer.start_as_current_span("rag.search"):
+            dense = await _dense_search(session, query_vec, settings.retrieval_top_k)
+            sparse = await _sparse_search(session, question, settings.retrieval_top_k)
 
-    # 4. Rerank (optional — slow on CPU, fast on GPU)
-    if rerank:
-        top = _rerank(question, fused, settings.rerank_top_n)
-    else:
-        top = fused[: settings.rerank_top_n]
+        fused = _rrf([dense, sparse])
 
-    # 5. Build Source objects for the LLM
+        if rerank:
+            with tracer.start_as_current_span("rag.rerank"):
+                with timed(RERANKER_LATENCY):
+                    top = _rerank(question, fused, settings.rerank_top_n)
+        else:
+            top = fused[: settings.rerank_top_n]
+
+        span.set_attribute("chunks.returned", len(top))
+
     return [
-        Source(
-            title=c.title,
-            url=c.url,
-            source=c.source,
-            excerpt=c.content[:400],
-        )
+        Source(title=c.title, url=c.url, source=c.source, excerpt=c.content[:400])
         for c in top
     ]
 

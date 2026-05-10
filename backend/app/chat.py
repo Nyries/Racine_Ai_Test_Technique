@@ -13,11 +13,15 @@ import json
 from collections.abc import AsyncGenerator
 
 import httpx
+from opentelemetry import trace
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.models import ChatRequest, Source
+from app.observability import LLM_FIRST_TOKEN_LATENCY, RAG_ERRORS
 from app.retriever import retrieve
+
+tracer = trace.get_tracer("rag.chat")
 
 _TIMEOUT = httpx.Timeout(connect=5.0, read=60.0, write=10.0, pool=5.0)
 
@@ -53,6 +57,7 @@ async def stream_chat(
     try:
         sources = await retrieve(request.messages[-1].content, session)
     except Exception as e:
+        RAG_ERRORS.labels(stage="retrieval").inc()
         yield _sse({"type": "error", "message": f"Retrieval failed: {type(e).__name__}"})
         return
 

@@ -5,11 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.chat import stream_chat
 from app.config import get_settings
 from app.ingest import create_tables
 from app.models import ChatRequest, HealthResponse
+from app.observability import setup_logging, setup_tracing
+
 
 
 # ---------------------------------------------------------------------------
@@ -22,6 +25,8 @@ _session_factory = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global _engine, _session_factory
+    setup_logging()
+    setup_tracing()
     settings = get_settings()
     _engine = create_async_engine(settings.database_url, pool_size=10, max_overflow=20)
     _session_factory = async_sessionmaker(_engine, expire_on_commit=False)
@@ -39,6 +44,8 @@ async def get_session() -> AsyncSession:
 # App
 # ---------------------------------------------------------------------------
 app = FastAPI(title="Middle East Geopolitics RAG", lifespan=lifespan)
+
+Instrumentator().instrument(app).expose(app, include_in_schema=False)
 
 app.add_middleware(
     CORSMiddleware,

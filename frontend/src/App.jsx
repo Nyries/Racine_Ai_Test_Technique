@@ -128,7 +128,42 @@ function App() {
   }
 
   return (
-    <div className={styles.app}>
+    <div className={styles.layout}>
+
+      <aside className={styles.sidebar}>
+        <div className={styles.sidebarLogo}>🌍</div>
+        <h1 className={styles.sidebarTitle}>Chatbot RAG<br />Moyen-Orient</h1>
+        <p className={styles.sidebarDesc}>
+          Ce chatbot répond à vos questions sur la géopolitique du Moyen-Orient
+          en s'appuyant sur un corpus de <strong>~7 800 documents</strong> issus
+          de RAND Corporation, Brookings Institution, Wilson Center, arXiv et Wikipedia.
+        </p>
+
+        <div className={styles.sidebarSection}>
+          <div className={styles.sidebarSectionTitle}>Comment l'utiliser</div>
+          <ul className={styles.sidebarList}>
+            <li>Posez une question précise sur un pays, un conflit ou un accord diplomatique</li>
+            <li>Le chatbot cite ses sources — cliquez sur les liens pour accéder aux articles</li>
+            <li>La conversation a une mémoire : posez des questions de suivi</li>
+          </ul>
+        </div>
+
+        <div className={styles.sidebarSection}>
+          <div className={styles.sidebarSectionTitle}>Exemples de questions</div>
+          <ul className={styles.sidebarExamples}>
+            <li>"Quel rôle joue l'Iran dans la politique régionale ?"</li>
+            <li>"Quelles sont les causes du conflit israélo-palestinien ?"</li>
+            <li>"Comment les accords d'Abraham ont-ils changé la région ?"</li>
+            <li>"Quelle est la position de la Turquie au Moyen-Orient ?"</li>
+          </ul>
+        </div>
+
+        <div className={styles.sidebarNote}>
+          ⏱ Les réponses prennent 20–40s (traitement du corpus sur CPU).
+        </div>
+      </aside>
+
+      <div className={styles.app}>
       <header className={styles.header}>
         Géopolitique du Moyen-Orient
       </header>
@@ -180,6 +215,8 @@ function App() {
           Envoyer
         </button>
       </div>
+    </div>
+
     </div>
   )
 }

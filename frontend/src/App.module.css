@@ -1,5 +1,101 @@
+.layout {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 20px;
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 16px;
+}
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 88vh;
+  overflow-y: auto;
+}
+
+.sidebarLogo {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.sidebarTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #111;
+  line-height: 1.3;
+}
+
+.sidebarDesc {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.6;
+}
+
+.sidebarSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebarSectionTitle {
+  font-size: 11px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.sidebarList {
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebarList li {
+  font-size: 13px;
+  color: #444;
+  line-height: 1.5;
+}
+
+.sidebarExamples {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sidebarExamples li {
+  font-size: 12px;
+  color: #555;
+  background: #f5f7fa;
+  border-radius: 6px;
+  padding: 7px 10px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.sidebarNote {
+  font-size: 12px;
+  color: #999;
+  line-height: 1.5;
+  padding-top: 4px;
+  border-top: 1px solid #eee;
+}
+
 .app {
-  width: 680px;
+  flex: 1;
+  min-width: 0;
   height: 88vh;
   background: white;
   border-radius: 12px;
@@ -154,6 +250,16 @@
 /* Mobile responsive */
 
 @media (max-width: 720px) {
+  .layout {
+    flex-direction: column;
+    padding: 0;
+    gap: 0;
+  }
+
+  .sidebar {
+    display: none;
+  }
+
   .app {
     width: 100%;
     height: 100vh;

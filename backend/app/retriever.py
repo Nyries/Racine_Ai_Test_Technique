@@ -149,10 +149,14 @@ async def retrieve(question: str, session: AsyncSession, rerank: bool = True) ->
 
         span.set_attribute("chunks.returned", len(top))
 
-    return [
-        Source(title=c.title, url=c.url, source=c.source, excerpt=c.content[:400])
-        for c in top
-    ]
+    seen: set[str] = set()
+    sources: list[Source] = []
+    for c in top:
+        key = c.url or c.title
+        if key not in seen:
+            seen.add(key)
+            sources.append(Source(title=c.title, url=c.url, source=c.source, excerpt=c.content[:400]))
+    return sources
 
 
 if __name__ == "__main__":

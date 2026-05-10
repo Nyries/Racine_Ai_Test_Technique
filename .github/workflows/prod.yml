@@ -79,7 +79,7 @@ jobs:
             docker pull "$FRONTEND_IMAGE"
 
             # Update image tags in .env
-            git -C /app pull
+            sudo git -C /app pull
             sed -i '/^BACKEND_IMAGE/d' /app/.env
             sed -i '/^FRONTEND_IMAGE/d' /app/.env
             echo "BACKEND_IMAGE=$BACKEND_IMAGE" >> /app/.env

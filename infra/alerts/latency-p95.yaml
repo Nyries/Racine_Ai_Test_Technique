@@ -1,0 +1,14 @@
+groups:
+  - name: rag.latency
+    rules:
+      - alert: BackendHighLatencyP95
+        expr: |
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{job="rag-backend"}[5m])) by (le)
+          ) > 90
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: p95 latency exceeds 90s
+          description: "p95 request latency is {{ $value | humanizeDuration }}, above the 90s SLO threshold."

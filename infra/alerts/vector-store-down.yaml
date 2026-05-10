@@ -1,0 +1,14 @@
+groups:
+  - name: rag.vector_store
+    rules:
+      - alert: VectorStoreDown
+        expr: |
+          sum(rate(http_requests_total{job="rag-backend", handler="/health", status="500"}[2m])) > 0
+          or
+          absent(http_requests_total{job="rag-backend", handler="/health"})
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: Vector store (PostgreSQL/pgvector) unreachable
+          description: "The /health endpoint reports the database as unreachable for more than 1 minute."

@@ -1,0 +1,14 @@
+groups:
+  - name: rag.error_rate
+    rules:
+      - alert: BackendHighErrorRate
+        expr: |
+          sum(rate(http_requests_total{job="rag-backend", status=~"5.."}[5m]))
+          /
+          sum(rate(http_requests_total{job="rag-backend"}[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Backend error rate exceeds 5%
+          description: "{{ $value | humanizePercentage }} of requests are failing over the last 5 minutes."

@@ -1,0 +1,40 @@
+// ── Prometheus : scrape backend /metrics → Grafana Cloud ──────────────────────
+
+prometheus.scrape "backend" {
+  targets = [{"__address__" = "backend:8000", "job" = "rag-backend"}]
+  metrics_path    = "/metrics"
+  scrape_interval = "15s"
+  forward_to      = [prometheus.remote_write.grafana.receiver]
+}
+
+prometheus.remote_write "grafana" {
+  endpoint {
+    url = env("GRAFANA_PROM_URL")
+    basic_auth {
+      username = env("GRAFANA_PROM_USER")
+      password = env("GRAFANA_PROM_PASSWORD")
+    }
+  }
+}
+
+// ── Loki : logs Docker des containers → Grafana Cloud ─────────────────────────
+
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+loki.source.docker "containers" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.containers.targets
+  forward_to = [loki.write.grafana.receiver]
+}
+
+loki.write "grafana" {
+  endpoint {
+    url = env("GRAFANA_LOKI_URL")
+    basic_auth {
+      username = env("GRAFANA_LOKI_USER")
+      password = env("GRAFANA_LOKI_PASSWORD")
+    }
+  }
+}

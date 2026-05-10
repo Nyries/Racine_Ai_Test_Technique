@@ -32,14 +32,16 @@ runcmd:
 
   # Secrets écrits dans /run/secrets/ (tmpfs — RAM uniquement, jamais sur disque)
   - mkdir -p /run/secrets
-  - chmod 700 /run/secrets
+  - chown root:ubuntu /run/secrets
+  - chmod 750 /run/secrets
   - |
     cat > /run/secrets/app.env << 'ENVEOF'
     POSTGRES_PASSWORD=${postgres_password}
     OPENROUTER_API_KEY=${openrouter_api_key}
     DATABASE_URL=postgresql+asyncpg://rag_user:${postgres_password}@db:5432/ragdb
     ENVEOF
-  - chmod 400 /run/secrets/app.env
+  - chown root:ubuntu /run/secrets/app.env
+  - chmod 440 /run/secrets/app.env
 
   # Démarrage des containers avec les secrets
   - docker compose --env-file /run/secrets/app.env -f /app/docker-compose.yml up -d

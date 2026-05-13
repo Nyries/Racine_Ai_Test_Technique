@@ -172,7 +172,31 @@ Application déployée sur OVH (cloud souverain européen) : **https://rag-geopo
 
 Infrastructure as Code : Terraform — `terraform apply` reconstruit l'environnement complet depuis zéro.
 
+### Prérequis avant `terraform apply`
+
+Deux fichiers gitignorés doivent être créés à partir de leurs exemples :
+
 ```bash
+# 1. Variables Terraform (secrets applicatifs + config)
+cp infra/terraform.tfvars.example infra/terraform.tfvars
+# Remplir toutes les valeurs dans terraform.tfvars
+
+# 2. Variables d'environnement (credentials OVH API + OpenStack)
+cp infra/setup-env.example.sh infra/setup-env.sh
+# Remplir toutes les valeurs dans setup-env.sh
+source infra/setup-env.sh
+```
+
+Les valeurs nécessaires sont :
+- **OpenStack credentials** : disponibles dans l'openrc.sh téléchargeable depuis la console OVH (Public Cloud → utilisateurs)
+- **OVH API credentials** : créer une application sur [api.ovh.com/createApp](https://api.ovh.com/createApp/) puis générer une consumer key via `POST /auth/credential`
+- **S3 credentials** : créer des clés S3 dans la console OVH (Object Storage → Mes credentials S3)
+- **Grafana credentials** : créés lors de la configuration de Grafana Cloud (Prometheus + Loki)
+
+```bash
+# Charger les variables d'environnement (obligatoire avant toute commande terraform)
+source infra/setup-env.sh
+
 cd infra
 terraform init
 terraform apply
@@ -195,24 +219,23 @@ Pour que les pipelines CI/CD tournent, les secrets et variables suivants doivent
 | `GRAFANA_LOKI_PASSWORD` | Secret | Token Loki Grafana Cloud |
 | `DOMAIN_NAME` | Variable | `rag-geopolitique.duckdns.org` |
 
-Les secrets applicatifs (`POSTGRES_PASSWORD`, `OPENROUTER_API_KEY`) sont injectés via cloud-init au démarrage de la VM dans `/run/secrets/app.env` (tmpfs RAM, jamais sur disque). Ils ne transitent pas par GitHub Actions.
+### Gestion des secrets
+
+Aucun fichier `.env` n'est présent sur la machine. Les secrets applicatifs sont injectés par Terraform via `cloud-init` au premier démarrage de la VM, dans un fichier **tmpfs** (`/run/secrets/app.env`) résidant exclusivement en RAM — jamais écrit sur disque, détruit au reboot.
+
+```
+terraform.tfvars (local, gitignored)
+    └─► cloud-init user_data (injecté par Terraform)
+            └─► /run/secrets/app.env (tmpfs RAM, chmod 440, root:ubuntu)
+                    └─► docker compose --env-file (lu par les containers)
+```
+
+**OVH OKMS investigué** : l'API centralisée OVH (`/v2/okms/resource/*/secret/*`) retourne uniquement les métadonnées. La lecture des valeurs requiert l'API régionale (`eu-west-gra.okms.ovh.net`) qui exige une authentification mTLS via service key — incompatible avec un script cloud-init bash. L'approche tmpfs offre des garanties équivalentes pour ce contexte : secrets en RAM uniquement, isolation par permissions Unix, aucune persistance disque.
 
 La VM est configurée automatiquement via cloud-init (Docker, Caddy, clone du repo, démarrage des containers). Attendre la fin avec :
 
 ```bash
 ssh ubuntu@<vm-ip> "sudo cloud-init status --wait"
-```
-
-### Copier le corpus
-
-Le corpus nettoyé n'est pas versionné dans Git (fichiers trop lourds). Après chaque recréation de VM, copier les shards manuellement :
-
-```bash
-# Créer le dossier sur la VM
-ssh ubuntu@<vm-ip> "mkdir -p /app/data/clean"
-
-# Copier les shards depuis la machine locale
-scp data/clean/*.jsonl ubuntu@<vm-ip>:/app/data/clean/
 ```
 
 ### Lancer l'ingestion
@@ -246,7 +269,7 @@ Ce projet a été développé avec **Claude Code** (Anthropic) comme assistant d
 
 | Service | Coût |
 |---|---|
-| OVH AI Training (CPT) | ~9 $ |
-| OVH infrastructure (VM + réseau) | inclus ci-dessus |
-| OpenRouter (LLM free tier) | 0 € |
-| **Total** | **~9 $** |
+| OVH AI Training (CPT) | 4,64 $ |
+| OVH VM (0,158 $/h, en cours) | ~3,50 $ |
+| OpenRouter (LLM free tier) | 0 $ |
+| **Total** | **~8,14 $** |

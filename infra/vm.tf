@@ -16,9 +16,15 @@ resource "openstack_compute_instance_v2" "app" {
   security_groups = ["default"]
 
   user_data = templatefile("${path.module}/cloud-init.yaml", {
-    postgres_password  = var.postgres_password
-    openrouter_api_key = var.openrouter_api_key
-    domain_name        = var.domain_name
+    postgres_password     = var.postgres_password
+    openrouter_api_key    = var.openrouter_api_key
+    domain_name           = var.domain_name
+    grafana_prom_url      = var.grafana_prom_url
+    grafana_prom_user     = var.grafana_prom_user
+    grafana_prom_password = var.grafana_prom_password
+    grafana_loki_url      = var.grafana_loki_url
+    grafana_loki_user     = var.grafana_loki_user
+    grafana_loki_password = var.grafana_loki_password
   })
 
   # "Ext-Net" is OVH's public network — assigns a public IP to the VM

@@ -37,20 +37,39 @@ variable "artifacts_bucket" {
   default     = "rag-artifacts"
 }
 
-variable "ovh_app_key" {
-  description = "OVH Application Key — read-only access to OKMS secrets"
+variable "grafana_prom_url" {
+  description = "Grafana Cloud Prometheus remote write URL"
   type        = string
   sensitive   = true
 }
 
-variable "ovh_app_secret" {
-  description = "OVH Application Secret"
+variable "grafana_prom_user" {
+  description = "Grafana Cloud Prometheus username"
   type        = string
   sensitive   = true
 }
 
-variable "ovh_consumer_key" {
-  description = "OVH Consumer Key"
+variable "grafana_prom_password" {
+  description = "Grafana Cloud Prometheus API token"
   type        = string
   sensitive   = true
 }
+
+variable "grafana_loki_url" {
+  description = "Grafana Cloud Loki push URL"
+  type        = string
+  sensitive   = true
+}
+
+variable "grafana_loki_user" {
+  description = "Grafana Cloud Loki username"
+  type        = string
+  sensitive   = true
+}
+
+variable "grafana_loki_password" {
+  description = "Grafana Cloud Loki API token"
+  type        = string
+  sensitive   = true
+}
+

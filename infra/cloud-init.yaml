@@ -30,6 +30,12 @@ runcmd:
   - git clone https://github.com/Nyries/Racine_Ai_Test_Technique.git /app
   - chown -R ubuntu:ubuntu /app
 
+  # ── Corpus : téléchargement depuis HuggingFace Datasets ───────────────────
+  - mkdir -p /app/data/clean
+  - pip3 install -q huggingface_hub
+  - python3 -c "from huggingface_hub import snapshot_download; snapshot_download('Nyries/middle-east-geopolitics-corpus', repo_type='dataset', local_dir='/app/data/clean', ignore_patterns=['*.md', '.gitattributes', '*.json'])"
+  - chown -R ubuntu:ubuntu /app/data
+
   # Secrets écrits dans /run/secrets/ (tmpfs — RAM uniquement, jamais sur disque)
   - mkdir -p /run/secrets
   - chown root:ubuntu /run/secrets
@@ -39,6 +45,12 @@ runcmd:
     POSTGRES_PASSWORD=${postgres_password}
     OPENROUTER_API_KEY=${openrouter_api_key}
     DATABASE_URL=postgresql+asyncpg://rag_user:${postgres_password}@db:5432/ragdb
+    GRAFANA_PROM_URL=${grafana_prom_url}
+    GRAFANA_PROM_USER=${grafana_prom_user}
+    GRAFANA_PROM_PASSWORD=${grafana_prom_password}
+    GRAFANA_LOKI_URL=${grafana_loki_url}
+    GRAFANA_LOKI_USER=${grafana_loki_user}
+    GRAFANA_LOKI_PASSWORD=${grafana_loki_password}
     ENVEOF
   - chown root:ubuntu /run/secrets/app.env
   - chmod 440 /run/secrets/app.env

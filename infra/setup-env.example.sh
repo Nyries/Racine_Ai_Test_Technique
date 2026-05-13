@@ -14,6 +14,7 @@ export OS_USERNAME="<your-openstack-username>"
 export OS_REGION_NAME="GRA"
 echo "Enter OpenStack password for $OS_USERNAME:"
 read -sr OS_PASSWORD
+echo
 export OS_PASSWORD
 
 # OVH API credentials — create at https://api.ovh.com/createApp/
@@ -28,4 +29,16 @@ export OVH_CONSUMER_KEY="<your-consumer-key>"
 export AWS_ACCESS_KEY_ID="<your-s3-access-key>"
 export AWS_SECRET_ACCESS_KEY="<your-s3-secret-key>"
 
-echo "Environment ready."
+# Validate OpenStack credentials
+echo "Validating credentials..."
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+  -X POST "${OS_AUTH_URL}/auth/tokens" \
+  -H "Content-Type: application/json" \
+  -d "{\"auth\":{\"identity\":{\"methods\":[\"password\"],\"password\":{\"user\":{\"name\":\"${OS_USERNAME}\",\"domain\":{\"name\":\"${OS_USER_DOMAIN_NAME}\"},\"password\":\"${OS_PASSWORD}\"}}},\"scope\":{\"project\":{\"id\":\"${OS_TENANT_ID}\"}}}}")
+
+if [ "$HTTP_CODE" = "201" ]; then
+  echo "Environment ready."
+else
+  echo "ERROR: Invalid OpenStack password (HTTP $HTTP_CODE). Environment NOT ready."
+  return 1
+fi

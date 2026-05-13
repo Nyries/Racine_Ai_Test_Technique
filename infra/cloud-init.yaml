@@ -10,6 +10,7 @@ packages:
   - apt-transport-https
   - debian-keyring
   - debian-archive-keyring
+  - python3-pip
 
 runcmd:
   # ── Docker ────────────────────────────────────────────────────────────────
@@ -32,7 +33,7 @@ runcmd:
 
   # ── Corpus : téléchargement depuis HuggingFace Datasets ───────────────────
   - mkdir -p /app/data/clean
-  - python3 -m pip install huggingface_hub
+  - python3 -m pip install --break-system-packages huggingface_hub
   - python3 -c "from huggingface_hub import snapshot_download; snapshot_download('Nyries/middle-east-geopolitics-corpus', repo_type='dataset', local_dir='/app/data/clean', ignore_patterns=['*.md', '.gitattributes', '*.json'])"
   - chown -R ubuntu:ubuntu /app/data
 

@@ -1,0 +1,31 @@
+# Copy this file to terraform.tfvars and fill in all values.
+# Never commit terraform.tfvars (it is gitignored).
+
+# OVH Public Cloud project ID (OS_TENANT_ID in openrc.sh)
+ovh_project_id = "<your-project-id>"
+
+# VM flavor — b2-15 = 4 vCPU, 15 GB RAM (~0.158 $/h)
+vm_flavor = "b2-15"
+
+# SSH public key for VM access (contents of ~/.ssh/id_ed25519.pub)
+ssh_public_key = "ssh-ed25519 AAAA..."
+
+# Domain name pointing to the VM IP (e.g. via DuckDNS)
+domain_name = "your-subdomain.duckdns.org"
+
+# Application secrets — injected into VM RAM at boot via cloud-init
+postgres_password  = "<strong-random-password>"
+openrouter_api_key = "<your-openrouter-api-key>"
+
+# Grafana Cloud credentials — Prometheus remote write
+grafana_prom_url      = "https://prometheus-prod-XX-prod-XX.grafana.net/api/prom/push"
+grafana_prom_user     = "<prometheus-username>"
+grafana_prom_password = "<prometheus-api-token>"
+
+# Grafana Cloud credentials — Loki log push
+grafana_loki_url      = "https://logs-prod-XXX.grafana.net/loki/api/push"
+grafana_loki_user     = "<loki-username>"
+grafana_loki_password = "<loki-api-token>"
+
+# OVH Object Storage bucket name for Terraform state
+artifacts_bucket = "rag-artifacts"

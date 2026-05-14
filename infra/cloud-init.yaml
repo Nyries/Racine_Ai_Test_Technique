@@ -10,7 +10,6 @@ packages:
   - apt-transport-https
   - debian-keyring
   - debian-archive-keyring
-  - python3-pip
 
 runcmd:
   # ── Docker ────────────────────────────────────────────────────────────────
@@ -30,12 +29,6 @@ runcmd:
   # ── Application ───────────────────────────────────────────────────────────
   - git clone https://github.com/Nyries/Racine_Ai_Test_Technique.git /app
   - chown -R ubuntu:ubuntu /app
-
-  # ── Corpus : téléchargement depuis HuggingFace Datasets ───────────────────
-  - mkdir -p /app/data/clean
-  - python3 -m pip install --break-system-packages huggingface_hub
-  - python3 -c "from huggingface_hub import snapshot_download; snapshot_download('Nyries/middle-east-geopolitics-corpus', repo_type='dataset', local_dir='/app/data/clean', ignore_patterns=['*.md', '.gitattributes', '*.json'])"
-  - chown -R ubuntu:ubuntu /app/data
 
   # Secrets écrits dans /run/secrets/ (tmpfs — RAM uniquement, jamais sur disque)
   - mkdir -p /run/secrets
@@ -58,6 +51,12 @@ runcmd:
 
   # Démarrage des containers avec les secrets
   - docker compose --env-file /run/secrets/app.env -f /app/docker-compose.yml up -d
+
+  # ── Corpus : téléchargement depuis HuggingFace via le container backend ────
+  - mkdir -p /app/data/clean
+  - chown -R ubuntu:ubuntu /app/data
+  - sleep 30
+  - docker exec $(docker ps -qf name=backend) python3 /app/scripts/download_corpus.py
 
   # ── Caddy : reverse proxy vers le frontend, TLS automatique ───────────────
   - |

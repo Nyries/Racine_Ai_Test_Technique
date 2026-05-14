@@ -28,61 +28,52 @@ Chatbot conversationnel basé sur un pipeline RAG (Retrieval-Augmented Generatio
 
 ### Prérequis
 
-- Python 3.11+
-- Node.js 18+
-- Docker
-- Git Bash ou WSL (pour `make` sur Windows)
+- Docker Desktop
+- Git
 
 ### 1. Cloner et configurer
 
 ```bash
 git clone <repo-url>
 cd Racine_Ai_Test_Technique
-cp backend/.env.example backend/.env
-# Remplir OPENROUTER_API_KEY dans backend/.env
 ```
 
-### 2. Installation complète en une commande
+Créer le fichier `.env` à la racine à partir de l'exemple :
 
 ```bash
-make setup
-# Équivalent à : make install + make db-start + make ingest-sample + make test
+cp .env.example .env
+# Remplir OPENROUTER_API_KEY dans .env
 ```
 
-### 3. Lancer l'application
-
-Dans deux terminaux séparés :
+### 2. Lancer l'application
 
 ```bash
-# Terminal 1
-make dev-backend   # FastAPI sur http://localhost:8000
-
-# Terminal 2
-make dev-frontend  # React sur http://localhost:5173
+docker compose up -d
 ```
 
-Ouvrir [http://localhost:5173](http://localhost:5173).
+Cela démarre automatiquement PostgreSQL, le backend (port 8000) et le frontend (port 3000).
 
-### Ingestion complète du corpus (optionnel)
-
-`make ingest-sample` ingère 100 documents pour une démo rapide. Pour le corpus complet (~7 800 docs, ~3-6h sur CPU) :
+### 3. Ingérer le corpus
 
 ```bash
-make ingest
+# 100 documents pour une démo rapide (~5 min)
+docker exec -it $(docker ps -qf name=backend) python -m app.ingest --limit 100
+
+# Corpus complet (~7 800 docs, ~3-6h sur CPU)
+docker exec -it $(docker ps -qf name=backend) python -m app.ingest
 ```
 
-### Commandes disponibles
+Ouvrir [http://localhost:3000](http://localhost:3000).
+
+### Commandes utiles
 
 | Commande | Description |
 |---|---|
-| `make install` | Installe les dépendances Python + npm |
-| `make db-start` | Lance PostgreSQL+pgvector via Docker |
-| `make ingest` | Ingère tout le corpus |
-| `make ingest-sample` | Ingère 100 docs (test rapide) |
-| `make test` | Lance la suite de tests |
-| `make benchmark` | Benchmark Recall + latence |
-| `make dev-backend` | Serveur FastAPI en mode reload |
-| `make dev-frontend` | Serveur Vite en mode HMR |
+| `docker compose up -d` | Démarre tous les services |
+| `docker compose down` | Arrête tous les services |
+| `docker compose logs -f backend` | Logs du backend en temps réel |
+| `docker exec -it $(docker ps -qf name=backend) pytest` | Lance les tests |
+| `docker exec -it $(docker ps -qf name=backend) python -m benchmark.run_benchmark` | Benchmark Recall + latence |
 
 ---
 

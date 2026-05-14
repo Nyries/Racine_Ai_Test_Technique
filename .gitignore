@@ -6,7 +6,6 @@
 
 # Fichiers de secrets
 .env
-backend/.env
 
 # Python
 __pycache__/
